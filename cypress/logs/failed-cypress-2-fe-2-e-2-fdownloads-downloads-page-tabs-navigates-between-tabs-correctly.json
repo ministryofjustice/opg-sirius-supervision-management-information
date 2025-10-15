@@ -1,0 +1,11 @@
+{
+  "specName": "cypress%2Fe2e%2Fdownloads.cy.js",
+  "title": "navigates between tabs correctly",
+  "suiteName": "Tabs",
+  "testName": "Downloads page Tabs navigates between tabs correctly",
+  "testError": "Timed out retrying after 4000ms: Expected to find element: `[data-cy=\"annual-invoicing-letters\"]`, but never found it.",
+  "testCommands": [
+    "visit /downloads",
+    "get [data-cy=\"annual-invoicing-letters\"]"
+  ]
+}

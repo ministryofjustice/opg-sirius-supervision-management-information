@@ -1,0 +1,15 @@
+{
+  "specName": "cypress/e2e/downloads.cy.js",
+  "title": "navigates between tabs correctly",
+  "suiteName": "Tabs",
+  "testName": "Downloads page Tabs navigates between tabs correctly",
+  "testError": "Timed out retrying after 4000ms: Expected to find content: 'Annual Invoicing Letters' within the selector: '.moj-sub-navigation__link' but never did.",
+  "testCommands": [
+    "visit /downloads",
+    "url ",
+    "assert expected **http://localhost:7777/management-information/downloads** to include **/downloads**",
+    "contains Management information",
+    "contains .moj-sub-navigation__link, Annual Invoicing Letters",
+    "assert expected **subject** to have attribute **aria-current**"
+  ]
+}
