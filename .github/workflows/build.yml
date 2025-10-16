@@ -32,26 +32,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Go 1.22
-        uses: actions/setup-go@v1
+      - name: Set up Go 1.24.0
+        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
         with:
-          go-version: 1.22
+          go-version: 1.25.1
         id: go
 
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Run tests
-        run: make test
+      - name: Run unit tests
+        run: make unit-test
 
       - name: Test Summary
-        uses: test-summary/action@v2
+        uses: test-summary/action@31493c76ec9e7aa675f1585d3ed6f1da69269a86 # v2.4
         with:
           paths: "test-results/unit-tests.xml"
         if: always()
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           files: test-results/test-coverage.txt
           fail_ci_if_error: false
@@ -61,7 +61,7 @@ jobs:
     name: Go Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Go Lint
         run: make go-lint
 
@@ -107,83 +107,86 @@ jobs:
     name: Create Tags
     uses: ./.github/workflows/create-tags.yml
 
-  build-and-push:
-    name: "Build & Push Containers"
-    if: false
+  build:
+    name: Build Management Information
+    uses: ministryofjustice/opg-github-workflows/.github/workflows/build-multi-architecture-image.yml@27a0f72b83c6b026fa4131230289bfbed9049cc7 # v3.15.0
+    with:
+      image_name: 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information
+      build_options: --file docker/management-information/Dockerfile
+
+  push:
+    name: "Push Images"
     runs-on: ubuntu-latest
-    needs: ['test', 'lint']
-    outputs:
-      branch: ${{ steps.set-outputs.outputs.branch }}
-      tag: ${{ steps.bump_version.outputs.tag }}
+    needs: ['test', 'lint', 'gosec', 'create-tag', 'build']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: '0'
-      - name: Extract branch name
+      - uses: unfor19/install-aws-cli-action@f5b46b7f32cf5e7ebd652656c5036bf83dd1e60c # 1.0.8
+
+      - name: Set up Docker
         run: |
-          if [ "${{ github.head_ref }}" == "" ]; then
-            echo BRANCH_NAME=main >> $GITHUB_ENV
-          else
-            echo BRANCH_NAME=${{ github.head_ref }} >> $GITHUB_ENV
-          fi
-        id: extract_branch
-      - uses: unfor19/install-aws-cli-action@v1
-
-      - name: Build Container
-        run: make build
-
-      - name: Run Trivy vulnerability scanner
-        run: make scan
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+          echo '{"experimental": true, "features": { "containerd-snapshotter": true }}' | sudo tee -a /etc/docker/daemon.json
+          sudo systemctl restart docker
+          docker run --privileged --rm tonistiigi/binfmt --install all
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          sarif_file: 'test-results/'
+          path: /tmp/images
+          name: multi-arch-image
+      - name: Load Images
+        run: |
+          docker load -i /tmp/images/multi-arch-image.tar
 
-      - name: Bump Version
-        id: bump_version
-        uses: anothrNick/github-tag-action@1.67.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INITIAL_VERSION: 1.0.0
-          DEFAULT_BUMP: minor
-          PRERELEASE: true
-          PRERELEASE_SUFFIX: ${{ env.BRANCH_NAME }}
-          RELEASE_BRANCHES: main
-          WITH_V: true
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure OIDC AWS credentials for ECR push
+        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACTIONS }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACTIONS }}
+          role-to-assume: arn:aws:iam::311462405659:role/sirius-component-ecr-role
+          role-session-name: opg-sirius-supervision-management-information-github-actions-ecr-push
+          role-duration-seconds: 900
           aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::311462405659:role/sirius-actions-ci
-          role-duration-seconds: 3600
-          role-session-name: GitHubActions
 
       - name: ECR Login
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
         with:
           registries: 311462405659
 
-      - name: Push Container
+      - name: Run Trivy vulnerability scanner
+        env:
+          TRIVY_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-db:2
+          TRIVY_JAVA_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-java-db:1
+          DOCKER_USERNAME: ${{ steps.login-ecr.outputs.docker_username_311462405659_dkr_ecr_eu_west_1_amazonaws_com }}
+          DOCKER_PASSWORD: ${{ steps.login-ecr.outputs.docker_password_311462405659_dkr_ecr_eu_west_1_amazonaws_com }}
+        run: make scan
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@192325c86100d080feab897ff886c34abd4c83a3 # v3.30.3
+        if: always()
+        with:
+          sarif_file: 'test-results/trivy.sarif'
+          category: trivy-docker-management-information
+
+      - name: Push
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: sirius/sirius-management-information
         run: |
-          docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:${{ steps.bump_version.outputs.tag }}
-          if [ $BRANCH_NAME == "main" ]; then
-            docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:main-${{ steps.bump_version.outputs.tag }}
+          docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.create-tag.outputs.tag }}
+          if ${{ github.ref_name == 'main' }}
+          then
+            docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest $ECR_REGISTRY/$ECR_REPOSITORY:main-${{ needs.create-tag.outputs.tag }}
+            docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest $ECR_REGISTRY/$ECR_REPOSITORY:main-${{ needs.create-tag.outputs.tag }}-${{ needs.create-tag.outputs.timestamp }}
             # We want all of the tags pushed
-            docker push  --all-tags 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information
+            docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           else
-            docker push 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:${{ steps.bump_version.outputs.tag }}
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.create-tag.outputs.tag }}
           fi
 
   end_of_pr_workflow:
     name: End of PR Workflow
     runs-on: ubuntu-latest
     if: always()
-    needs: ['test', 'lint', 'cypress', 'create-tag', 'build-and-push']
+    needs: ['test', 'lint', 'cypress', 'create-tag', 'build', 'push']
     steps:
       - name: End of PR Workflow
         run: |
@@ -198,25 +201,27 @@ jobs:
 
   push-tags:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: ['create-tag', 'end_of_pr_workflow']
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure OIDC AWS credentials for SSM
+        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_ACTIONS }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_ACTIONS }}
+          role-to-assume: arn:aws:iam::997462338508:role/sirius-component-ssm-role
+          role-session-name: opg-sirius-supervision-management-information-github-actions-ssm-push
+          role-duration-seconds: 900
           aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::997462338508:role/sirius-actions-ci
-          role-duration-seconds: 3600
-          role-session-name: GitHubActions
 
       - name: Install AWS CLI
         id: install-aws-cli
-        uses: unfor19/install-aws-cli-action@v1
+        uses: unfor19/install-aws-cli-action@f5b46b7f32cf5e7ebd652656c5036bf83dd1e60c # 1.0.8
 
       - name: Push Tag to Parameter Store
         run: |
-          aws ssm put-parameter --name "opg-sirius-supervision-management-information-latest-green-build" --type "String" --value "${{ needs.build-and-push.outputs.tag }}" --overwrite --region=eu-west-1
+          aws ssm put-parameter --name "opg-sirius-supervision-management-information-latest-green-build" --type "String" --value "${{ needs.create-tag.outputs.tag }}" --overwrite --region=eu-west-1
+
+      - name: Trigger Dev Deploy
+        shell: bash
+        run: curl -u ${{ secrets.JENKINS_API_USER }}:${{ secrets.JENKINS_API_TOKEN }} "https://${{ secrets.JENKINS_URL }}/job/Sirius/job/Deploy_to_Development/build?token=${{ secrets.JENKINS_API_TOKEN_NAME }}&cause=Triggered+by+opg-sirius-supervision-management-information"
