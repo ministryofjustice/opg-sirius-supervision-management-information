@@ -10,6 +10,9 @@ setup-directories: test-results
 go-lint:
 	docker compose run --rm go-lint
 
+gosec: setup-directories
+	docker compose run --rm gosec
+
 build:
 	docker compose build --no-cache --parallel management-information
 
