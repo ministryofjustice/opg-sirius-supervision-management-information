@@ -1,4 +1,4 @@
-describe("Downloads page", () => {
+describe("Navigation page", () => {
     beforeEach(() => {
         cy.visit("/downloads");
     });
@@ -9,6 +9,8 @@ describe("Downloads page", () => {
             cy.contains("Management information");
             cy.contains(".moj-sub-navigation__link", "Downloads").should("be.visible");
             cy.contains(".moj-sub-navigation__link", "Uploads").should("be.visible");
+            cy.contains("Uploads").click();
+            cy.url().should("contain", "/uploads");
         });
     });
 });
