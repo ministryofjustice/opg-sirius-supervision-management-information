@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/internal/api"
+	"log/slog"
 	"net/http"
 	"time"
 )
@@ -53,15 +54,15 @@ func wrapHandler(errTmpl Template, errPartial string, envVars EnvironmentVars) f
 					return
 				}
 
-				logger.Error("Page Error", err)
-
 				code := http.StatusInternalServerError
 				var serverStatusError StatusError
 				if errors.As(err, &serverStatusError) {
+					logger.Error("server error", "error", err)
 					code = serverStatusError.Code()
 				}
 				var siriusStatusError api.StatusError
 				if errors.As(err, &siriusStatusError) {
+					logger.Error("sirius error", "error", err)
 					code = siriusStatusError.Code
 				}
 
@@ -79,7 +80,7 @@ func wrapHandler(errTmpl Template, errPartial string, envVars EnvironmentVars) f
 				}
 
 				if err != nil {
-					logger.Error("failed to render error template", err)
+					logger.Error("failed to render error template", slog.String("err", err.Error()))
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 			}

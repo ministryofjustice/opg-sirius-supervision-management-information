@@ -15,6 +15,17 @@ services:
       retries: 3
       start_period: 30s
 
+  cypress:
+    build:
+      dockerfile: docker/cypress/Dockerfile
+    command: [ "--headless", "-b", "electron" ]
+    volumes:
+      - ./cypress/screenshots:/root/cypress/screenshots:rw,delegated
+      - ./cypress/logs:/root/cypress/logs:rw,delegated
+    depends_on:
+      management-information:
+        condition: service_healthy
+
   go-lint:
     image: golangci/golangci-lint:v1.54.2
     working_dir: /go/src/app
