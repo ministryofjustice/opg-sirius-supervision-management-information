@@ -43,8 +43,9 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	templates := createTemplates(envVars)
 
 	s := &http.Server{
-		Addr:    ":" + envVars.Port,
-		Handler: server.New(logger, client, templates, envVars),
+		Addr:              ":" + envVars.Port,
+		Handler:           server.New(logger, client, templates, envVars),
+		ReadHeaderTimeout: 2 * time.Second,
 	}
 
 	go func() {
