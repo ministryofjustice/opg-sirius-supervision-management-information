@@ -83,7 +83,8 @@ func createTemplates(envVars server.EnvironmentVars) map[string]*template.Templa
 		},
 		"title": func(s string) string {
 			r := []rune(s)
-			r[0] = unicode.ToUpper(r[0])
+			letter := r[0]
+			r[0] = unicode.ToUpper(letter)
 
 			return string(r)
 		},
