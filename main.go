@@ -100,7 +100,6 @@ func createTemplates(envVars server.EnvironmentVars) map[string]*template.Templa
 	templateDir, _ := os.Open(templateDirPath)
 	templateDirs, _ := templateDir.Readdir(0)
 	_ = templateDir.Close()
-
 	mainTemplates, _ := filepath.Glob(templateDirPath + "/*.gotmpl")
 
 	for _, file := range mainTemplates {
