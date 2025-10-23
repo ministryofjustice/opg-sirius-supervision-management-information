@@ -96,7 +96,7 @@ func createTemplates(envVars server.EnvironmentVars) map[string]*template.Templa
 		},
 	}
 
-	templateDirPath := envVars.WebDir + "/template"
+	templateDirPath := filepath.Clean(envVars.WebDir + "/template")
 	templateDir, _ := os.Open(templateDirPath)
 	templateDirs, _ := templateDir.Readdir(0)
 	_ = templateDir.Close()
