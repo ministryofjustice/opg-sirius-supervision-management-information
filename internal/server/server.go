@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
+	"github.com/opg-sirius-supervision-management-information/internal/api"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
 	"io"
@@ -10,7 +11,9 @@ import (
 	"net/http"
 )
 
-type ApiClient interface{}
+type ApiClient interface {
+	GetCurrentUserDetails(api.Context) (api.Assignee, error)
+}
 
 type router interface {
 	Client() ApiClient
@@ -27,7 +30,7 @@ func New(logger *slog.Logger, client ApiClient, templates map[string]*template.T
 	mux := http.NewServeMux()
 
 	handleMux := func(pattern string, h Handler) {
-		errors := wrapHandler(templates["error.gotmpl"], "main", envVars)
+		errors := wrapHandler(client, templates["error.gotmpl"], "main", envVars)
 		mux.Handle(pattern, telemetry.Middleware(logger)(errors(h)))
 	}
 

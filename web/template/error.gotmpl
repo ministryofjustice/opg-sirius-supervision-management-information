@@ -12,15 +12,16 @@
 {{ end }}
 
 {{ define "main" }}
-    <div class="govuk-grid-row">
+    <div class="govuk-grid-row management-info-error">
         <div class="govuk-grid-column-two-thirds">
+            <br><br>
             {{ if eq .Code 403 }}
                 <h1 class="govuk-heading-l">Forbidden</h1>
                 <p class="govuk-body">
-                    You do not have access to view this page.
+                    You do not have access to view this page. Only users with the 'reporting user' permission can access it.
                 </p>
                 <p class="govuk-body">
-                    Please use your browser to go back to the previous page, or return to the <a class="govuk-link" href="{{ prefix "/" }}">homepage</a>.
+                    Please use your browser to go back to the previous page, or return to the <a class="govuk-link" href="{{ .EnvironmentVars.SiriusURL }}">Sirius homepage</a>.
                 </p>
             {{ else if eq .Code 404 }}
                 <h1 class="govuk-heading-l">Page not found</h1>
@@ -31,7 +32,7 @@
                     If you pasted the web address, check you copied the entire address.
                 </p>
                 <p class="govuk-body">
-                    Please use your browser to go back to the previous page, or return to the <a class="govuk-link" href="{{ prefix "/" }}">homepage</a>.
+                    Please use your browser to go back to the previous page, or return to the <a class="govuk-link" href="{{ .EnvironmentVars.SiriusURL }}">Sirius homepage</a>.
                 </p>
             {{ else }}
                 <h1 class="govuk-heading-l">Sorry, there is a problem with the service</h1>

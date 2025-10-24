@@ -7,6 +7,7 @@ import (
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/internal/api"
 	"github.com/opg-sirius-supervision-management-information/internal/server"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -30,16 +31,16 @@ func main() {
 }
 
 func run(ctx context.Context, logger *slog.Logger) error {
-	exportTraces := env.Get("TRACING_ENABLED", "0") == "1"
+	supervisionAPIPath := env.Get("SUPERVISION_API_PATH", "/supervision-api")
 
-	shutdown, err := telemetry.StartTracerProvider(ctx, logger, exportTraces)
-	defer shutdown()
-	if err != nil {
-		return err
-	}
+	httpClient := http.DefaultClient
+	httpClient.Transport = otelhttp.NewTransport(httpClient.Transport)
 
 	envVars := server.NewEnvironmentVars()
-	client := api.NewApiClient(http.DefaultClient)
+	client, err := api.NewApiClient(http.DefaultClient, envVars.SiriusURL+supervisionAPIPath, logger)
+	if err != nil {
+		logger.Error("Error creating new Api Client", "error", err)
+	}
 	templates := createTemplates(envVars)
 
 	s := &http.Server{
