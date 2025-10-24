@@ -1,11 +1,22 @@
 FROM golang:1.25-alpine AS base
+
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid 65532 \
+    app-user
+
 WORKDIR /app
 
 ENV CGO_ENABLED=0 GOOS=linux
 
 RUN update-ca-certificates
+RUN apk add --no-cache tzdata
 
-FROM node:20-alpine3.19 AS asset-env
+FROM node:22-alpine3.19 AS asset-env
 WORKDIR /app
 
 RUN mkdir -p web/static
@@ -17,12 +28,22 @@ COPY yarn.lock .
 RUN yarn install
 RUN yarn build
 
+FROM base AS healthcheck-build
+WORKDIR /app
+
+COPY healthcheck healthcheck
+
+WORKDIR /app/healthcheck
+
+RUN go build -a -installsuffix cgo -o /go/bin/healthcheck
+
 FROM base AS dev
 WORKDIR /app
 
 COPY --from=asset-env /app/web/static web/static
+COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
 
-RUN go install github.com/cosmtrek/air@v1.52.1 && go install github.com/go-delve/delve/cmd/dlv@latest
+RUN go install github.com/air-verse/air@latest && go install github.com/go-delve/delve/cmd/dlv@latest
 EXPOSE 8080
 EXPOSE 3456
 
@@ -40,17 +61,21 @@ COPY . .
 
 RUN go build -a -installsuffix cgo -o /go/bin/management-information
 
-FROM alpine:3 AS prod
-WORKDIR /go/bin
+FROM scratch AS prod
 
-RUN apk --update --no-cache add \
-    ca-certificates \
-    tzdata
-
-# Patch vulnerabilities
-RUN apk upgrade --no-cache busybox libcrypto3 libssl3
+COPY --from=base /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=base /etc/ca-certificates* /etc/
+COPY --from=base /usr/share/ca-certificates/ /usr/share/ca-certificates/
+COPY --from=base /etc/passwd /etc/passwd
+COPY --from=base /etc/group /etc/group
 
 COPY --from=build-env /go/bin/management-information management-information
 COPY --from=build-env /app/web/template web/template
 COPY --from=asset-env /app/web/static web/static
+COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
+
+USER app-user:app-user
+
+HEALTHCHECK --interval=5s --timeout=5s --start-period=5s --retries=5 CMD [ "/healthcheck" ]
+
 ENTRYPOINT ["./management-information"]

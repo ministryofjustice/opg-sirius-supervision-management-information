@@ -20,12 +20,13 @@
         <link href="{{ prefix "/stylesheets/all.css" }}" rel="stylesheet">
     </head>
 
-    <body class="govuk-template__body">
-    <sirius-header></sirius-header>
+    <body class="govuk-template__body management-info">
+
+    {{ template "header" . }}
 
     {{ block "main" . }}{{ end }}
 
-    <footer class="govuk-footer" role="contentinfo"> </footer>
+    {{ template "footer" . }}
     <script src="{{ prefix "/javascript/all.js" }}"></script>
     </body>
     </html>

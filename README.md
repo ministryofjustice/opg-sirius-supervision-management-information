@@ -24,6 +24,15 @@ Hot-reloading is managed independently and should happen seamlessly. Hot-reloadi
 is also provided via a Yarn watch command.
 
 -----
+
+Running without docker with:
+`yarn install && yarn build`
+`go run main.go`
+
+This will host at:
+`localhost:7777/downloads`.
+
+-----
 ## Run the unit/integration tests
 
 `make test`
