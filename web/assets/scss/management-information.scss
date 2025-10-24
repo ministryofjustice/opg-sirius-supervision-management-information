@@ -1,10 +1,35 @@
 // Sirius specific styles
-
-.sirius-admin {
+.management-info {
   .govuk-width-container,
   .moj-header__container,
   .moj-primary-navigation__container {
     max-width: none;
     padding: 0 15px;
+  }
+
+  .govuk-main-wrapper {
+    padding-top: 0px;
+  }
+
+  .moj-sub-navigation {
+    margin-bottom: 0;
+  }
+
+  main {
+    header {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5em 0 0.5em;
+      border-bottom: 1px solid $govuk-border-colour;
+      margin-bottom: 2em;
+    }
+  }
+
+  .hide {
+    display: none;
+  }
+
+  .no-underline {
+    text-decoration: none;
   }
 }
