@@ -12,7 +12,8 @@ func TestNewAppVars(t *testing.T) {
 	r.AddCookie(&http.Cookie{Name: "XSRF-TOKEN", Value: "abc123"})
 
 	envVars := EnvironmentVars{}
-	vars := NewAppVars(r, envVars)
+	client := mockApiClient{}
+	vars := NewAppVars(client, r, envVars)
 
 	assert.Equal(t, AppVars{
 		Path:            "/path",

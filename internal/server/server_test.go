@@ -1,6 +1,8 @@
 package server
 
 import (
+	"github.com/opg-sirius-supervision-management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"io"
 	"net/http"
 )
@@ -44,4 +46,13 @@ func (r *mockRoute) execute(w http.ResponseWriter, req *http.Request, data any) 
 	r.lastW = w
 	r.data = data
 	return r.error
+}
+
+type mockApiClient struct {
+	error error
+	User  model.User
+}
+
+func (m mockApiClient) GetCurrentUserDetails(context api.Context) (model.User, error) {
+	return m.User, nil
 }

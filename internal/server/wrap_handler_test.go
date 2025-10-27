@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -46,7 +47,21 @@ func Test_wrapHandler_successful_request(t *testing.T) {
 
 	errorTemplate := &mockTemplate{}
 	envVars := EnvironmentVars{}
-	nextHandlerFunc := wrapHandler(errorTemplate, "", envVars)
+	client := mockApiClient{
+		User: model.User{
+			Id:          1,
+			Name:        "Reporting User",
+			PhoneNumber: "123456",
+			Deleted:     false,
+			Email:       "reporting.user@email.com",
+			Firstname:   "Reporting",
+			Surname:     "User",
+			Roles:       []string{"Reporting User", "Case Manager"},
+			Locked:      false,
+			Suspended:   false,
+		},
+	}
+	nextHandlerFunc := wrapHandler(client, errorTemplate, "", envVars)
 	next := &mockHandler{}
 	httpHandler := nextHandlerFunc(next)
 	httpHandler.ServeHTTP(w, r)
@@ -84,7 +99,21 @@ func Test_wrapHandler_status_error_handling(t *testing.T) {
 
 			errorTemplate := &mockTemplate{error: errors.New("some template error")}
 			envVars := EnvironmentVars{}
-			nextHandlerFunc := wrapHandler(errorTemplate, "", envVars)
+			client := mockApiClient{
+				User: model.User{
+					Id:          1,
+					Name:        "Reporting User",
+					PhoneNumber: "123456",
+					Deleted:     false,
+					Email:       "reporting.user@email.com",
+					Firstname:   "Reporting",
+					Surname:     "User",
+					Roles:       []string{"Reporting User", "Case Manager"},
+					Locked:      false,
+					Suspended:   false,
+				},
+			}
+			nextHandlerFunc := wrapHandler(client, errorTemplate, "", envVars)
 			next := &mockHandler{Err: test.error}
 			httpHandler := nextHandlerFunc(next)
 			httpHandler.ServeHTTP(w, r)

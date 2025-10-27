@@ -33,14 +33,14 @@ This will host at:
 `localhost:7777/downloads`.
 
 -----
-## Run the unit/integration tests
+## Run the unit tests
 
 `make test`
 
-## Run the Cypress tests
-
+## Run the Cypress tests not in UI
+`make build-all`
 `make cypress`
 
 ## Run the Cypress tests in UI
-`make up` in one terminal (wait for the app to build)
-`yarn && yarn cypress` in another terminal
+`make dev-up` in one terminal (wait for the app to build)
+`npx cypress open baseUrl=http://localhost:7777/downloads` in another terminal

@@ -30,7 +30,8 @@ services:
       - ./cypress/screenshots:/root/cypress/screenshots:rw,delegated
       - ./cypress/logs:/root/cypress/logs:rw,delegated
     depends_on:
-      [management-information, json-server]
+      management-information:
+        condition: service_healthy
 
   go-lint:
     image: golangci/golangci-lint:v2.4.0
