@@ -1,6 +1,8 @@
 package model
 
-import "strings"
+import (
+	"slices"
+)
 
 type User struct {
 	Id          int      `json:"id"`
@@ -15,6 +17,6 @@ type User struct {
 	Suspended   bool     `json:"suspended"`
 }
 
-func (m User) GetRoles() string {
-	return strings.Join(m.Roles, ",")
+func (m User) IsReportingUser() bool {
+	return slices.Contains(m.Roles, "Reporting User")
 }

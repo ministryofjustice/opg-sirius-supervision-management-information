@@ -49,9 +49,7 @@ func NewAppVars(apiClient ApiClient, r *http.Request, envVars EnvironmentVars) A
 		token = r.FormValue("xsrfToken")
 	}
 
-	user, err := apiClient.GetCurrentUserDetails(ctx)
-	if err != nil {
-	}
+	user, _ := apiClient.GetCurrentUserDetails(ctx)
 
 	vars := AppVars{
 		Path:            r.URL.Path,

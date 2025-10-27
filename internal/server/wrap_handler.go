@@ -7,7 +7,6 @@ import (
 	"github.com/opg-sirius-supervision-management-information/internal/api"
 	"log/slog"
 	"net/http"
-	"slices"
 	"time"
 )
 
@@ -39,15 +38,7 @@ func wrapHandler(client ApiClient, errTmpl Template, errPartial string, envVars 
 			start := time.Now()
 			vars := NewAppVars(client, r, envVars)
 
-			fmt.Println(vars.User.Name)
-			fmt.Println("Roles found")
-			for _, role := range vars.User.Roles {
-				fmt.Println(role)
-			}
-
-			fmt.Println(slices.Contains(vars.User.Roles, "Reporting User"))
-
-			if !slices.Contains(vars.User.Roles, "Reporting User") {
+			if !vars.User.IsReportingUser() {
 				fmt.Println("Reporting User permission not found")
 				err := errTmpl.Execute(w, ErrorVars{
 					Code:            403,

@@ -49,8 +49,7 @@ func (r *mockRoute) execute(w http.ResponseWriter, req *http.Request, data any) 
 }
 
 type mockApiClient struct {
-	error error
-	User  model.User
+	User model.User
 }
 
 func (m mockApiClient) GetCurrentUserDetails(context api.Context) (model.User, error) {
