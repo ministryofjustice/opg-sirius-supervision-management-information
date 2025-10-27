@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/internal/api"
-	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -42,26 +41,12 @@ func (m *mockHandler) render(app AppVars, w http.ResponseWriter, r *http.Request
 
 func Test_wrapHandler_successful_request(t *testing.T) {
 	w := httptest.NewRecorder()
-	ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-finance-admin"))
+	ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-management-information"))
 	r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "test-url/1", nil)
 
-	errorTemplate := &mockTemplate{}
+	template := &mockTemplate{}
 	envVars := EnvironmentVars{}
-	client := mockApiClient{
-		User: model.User{
-			Id:          1,
-			Name:        "Reporting User",
-			PhoneNumber: "123456",
-			Deleted:     false,
-			Email:       "reporting.user@email.com",
-			Firstname:   "Reporting",
-			Surname:     "User",
-			Roles:       []string{"Reporting User", "Case Manager"},
-			Locked:      false,
-			Suspended:   false,
-		},
-	}
-	nextHandlerFunc := wrapHandler(client, errorTemplate, "", envVars)
+	nextHandlerFunc := wrapHandler(template, "", envVars)
 	next := &mockHandler{}
 	httpHandler := nextHandlerFunc(next)
 	httpHandler.ServeHTTP(w, r)
@@ -72,6 +57,23 @@ func Test_wrapHandler_successful_request(t *testing.T) {
 	assert.Equal(t, 1, next.Called)
 	assert.Equal(t, "test-url/1", next.app.Path)
 	assert.Equal(t, 200, w.Result().StatusCode)
+}
+
+func Test_wrapHandler_handles_permissions_errors_appropriately(t *testing.T) {
+	w := httptest.NewRecorder()
+	ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-management-information"))
+	r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "test-url/1", nil)
+
+	template := &mockTemplate{}
+	envVars := EnvironmentVars{}
+	nextHandlerFunc := wrapHandler(template, "", envVars)
+	next := &mockHandler{Err: errors.New("not reporting user")}
+	httpHandler := nextHandlerFunc(next)
+	httpHandler.ServeHTTP(w, r)
+
+	assert.Equal(t, 1, next.Called)
+	assert.Equal(t, 403, template.lastVars.(ErrorVars).Code)
+	assert.Equal(t, "Missing Reporting User permissions", template.lastVars.(ErrorVars).Error)
 }
 
 func Test_wrapHandler_status_error_handling(t *testing.T) {
@@ -94,26 +96,12 @@ func Test_wrapHandler_status_error_handling(t *testing.T) {
 	for i, test := range tests {
 		t.Run("Scenario "+strconv.Itoa(i), func(t *testing.T) {
 			w := httptest.NewRecorder()
-			ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-finance-admin"))
+			ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-management-information"))
 			r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "test-url/1", nil)
 
 			errorTemplate := &mockTemplate{error: errors.New("some template error")}
 			envVars := EnvironmentVars{}
-			client := mockApiClient{
-				User: model.User{
-					Id:          1,
-					Name:        "Reporting User",
-					PhoneNumber: "123456",
-					Deleted:     false,
-					Email:       "reporting.user@email.com",
-					Firstname:   "Reporting",
-					Surname:     "User",
-					Roles:       []string{"Reporting User", "Case Manager"},
-					Locked:      false,
-					Suspended:   false,
-				},
-			}
-			nextHandlerFunc := wrapHandler(client, errorTemplate, "", envVars)
+			nextHandlerFunc := wrapHandler(errorTemplate, "", envVars)
 			next := &mockHandler{Err: test.error}
 			httpHandler := nextHandlerFunc(next)
 			httpHandler.ServeHTTP(w, r)

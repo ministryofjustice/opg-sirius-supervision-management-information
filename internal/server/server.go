@@ -31,7 +31,7 @@ func New(logger *slog.Logger, client ApiClient, templates map[string]*template.T
 	mux := http.NewServeMux()
 
 	handleMux := func(pattern string, h Handler) {
-		errors := wrapHandler(client, templates["error.gotmpl"], "main", envVars)
+		errors := wrapHandler(templates["error.gotmpl"], "main", envVars)
 		mux.Handle(pattern, telemetry.Middleware(logger)(errors(h)))
 	}
 

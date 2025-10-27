@@ -40,7 +40,7 @@ func (e StatusError) Data() interface{} {
 }
 
 type Context struct {
-	Context   context.Context
+	context.Context
 	Cookies   []*http.Cookie
 	XSRFToken string
 }

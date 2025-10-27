@@ -26,9 +26,7 @@ func (t Tab) Path() string {
 	return "/" + t.Id
 }
 
-func NewAppVars(apiClient ApiClient, r *http.Request, envVars EnvironmentVars) AppVars {
-	ctx := getContext(r)
-
+func NewAppVars(r *http.Request, envVars EnvironmentVars) AppVars {
 	tabs := []Tab{
 		{
 			Id:    "downloads",
@@ -49,14 +47,11 @@ func NewAppVars(apiClient ApiClient, r *http.Request, envVars EnvironmentVars) A
 		token = r.FormValue("xsrfToken")
 	}
 
-	user, _ := apiClient.GetCurrentUserDetails(ctx)
-
 	vars := AppVars{
 		Path:            r.URL.Path,
 		XSRFToken:       token,
 		EnvironmentVars: envVars,
 		Tabs:            tabs,
-		User:            user,
 	}
 
 	return vars

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 )
 
@@ -27,6 +28,15 @@ func (r route) execute(w http.ResponseWriter, req *http.Request, data any) error
 	} else {
 		data := PageData{
 			Data: data,
+		}
+
+		ctx := getContext(req)
+		user, err := r.client.GetCurrentUserDetails(ctx)
+		if err != nil {
+			return err
+		}
+		if !user.IsReportingUser() {
+			return errors.New("not reporting user")
 		}
 		return r.tmpl.Execute(w, data)
 	}
