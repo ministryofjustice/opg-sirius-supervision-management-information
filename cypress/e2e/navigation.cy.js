@@ -1,7 +1,9 @@
 describe("Navigation page", () => {
     beforeEach(() => {
+        cy.setCookie("XSRF-TOKEN", "abcde");
         cy.visit("/downloads");
     });
+
 
     describe("Tabs", () => {
         it("navigates between tabs correctly", () => {

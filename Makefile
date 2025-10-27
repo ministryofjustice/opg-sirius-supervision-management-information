@@ -20,7 +20,7 @@ build-dev:
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --parallel management-information yarn
 
 build-all:
-	docker compose build --parallel management-information yarn cypress
+	docker compose build --parallel management-information yarn json-server cypress
 
 test: setup-directories
 	go run gotest.tools/gotestsum@latest --format testname  --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt

@@ -39,7 +39,16 @@ func wrapHandler(client ApiClient, errTmpl Template, errPartial string, envVars 
 			start := time.Now()
 			vars := NewAppVars(client, r, envVars)
 
+			fmt.Println(vars.User.Name)
+			fmt.Println("Roles found")
+			for _, role := range vars.User.Roles {
+				fmt.Println(role)
+			}
+
+			fmt.Println(slices.Contains(vars.User.Roles, "Reporting User"))
+
 			if !slices.Contains(vars.User.Roles, "Reporting User") {
+				fmt.Println("Reporting User permission not found")
 				err := errTmpl.Execute(w, ErrorVars{
 					Code:            403,
 					Error:           "Missing Reporting User permissions",
@@ -49,6 +58,7 @@ func wrapHandler(client ApiClient, errTmpl Template, errPartial string, envVars 
 					return
 				}
 			} else {
+				fmt.Println("Has reporting permission")
 				err := next.render(vars, w, r)
 
 				logger := telemetry.LoggerFromContext(r.Context())

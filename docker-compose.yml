@@ -10,6 +10,17 @@ services:
       PORT: 7777
       PREFIX: /management-information
       HEALTHCHECK: /management-information/health-check
+      SIRIUS_PUBLIC_URL: http://localhost:8080
+      SIRIUS_URL: http://json-server:3000
+    depends_on:
+      json-server:
+        condition: service_started
+
+  json-server:
+    build:
+      dockerfile: json-server/Dockerfile
+    ports:
+      - '3000:3000'
 
   cypress:
     build:
@@ -19,8 +30,7 @@ services:
       - ./cypress/screenshots:/root/cypress/screenshots:rw,delegated
       - ./cypress/logs:/root/cypress/logs:rw,delegated
     depends_on:
-      management-information:
-        condition: service_healthy
+      [management-information, json-server]
 
   go-lint:
     image: golangci/golangci-lint:v2.4.0
@@ -51,7 +61,7 @@ services:
       - TRIVY_PASSWORD=${DOCKER_PASSWORD}
 
   yarn:
-    image: node:20-alpine3.19
+    image: node:22-alpine3.19
     working_dir: /home/node/app
     entrypoint: yarn
     volumes:

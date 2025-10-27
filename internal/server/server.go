@@ -4,6 +4,7 @@ import (
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
 	"io"
@@ -12,7 +13,7 @@ import (
 )
 
 type ApiClient interface {
-	GetCurrentUserDetails(api.Context) (api.Assignee, error)
+	GetCurrentUserDetails(api.Context) (model.User, error)
 }
 
 type router interface {

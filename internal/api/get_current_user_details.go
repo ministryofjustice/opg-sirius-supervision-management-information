@@ -2,24 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"net/http"
 )
 
-type Assignee struct {
-	Id          int      `json:"id"`
-	Name        string   `json:"displayName"`
-	PhoneNumber string   `json:"phoneNumber"`
-	Deleted     bool     `json:"deleted"`
-	Email       string   `json:"email"`
-	Firstname   string   `json:"firstname"`
-	Surname     string   `json:"surname"`
-	Roles       []string `json:"roles"`
-	Locked      bool     `json:"locked"`
-	Suspended   bool     `json:"suspended"`
-}
-
-func (c *ApiClient) GetCurrentUserDetails(ctx Context) (Assignee, error) {
-	var v Assignee
+func (c *ApiClient) GetCurrentUserDetails(ctx Context) (model.User, error) {
+	var v model.User
 
 	req, err := c.newRequest(ctx, http.MethodGet, "/v1/users/current", nil)
 	if err != nil {
