@@ -17,7 +17,7 @@ build:
 	docker compose build --no-cache --parallel management-information
 
 build-dev:
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --parallel management-information yarn json-server
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --no-cache --parallel management-information yarn json-server
 
 build-all:
 	docker compose build --parallel management-information json-server cypress
@@ -35,12 +35,6 @@ clean:
 
 up: clean build-dev
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information yarn
-
-dev-up:
-	docker compose down
-	docker compose run --rm yarn
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --no-cache management-information
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information yarn json-server
 
 down:
 	docker compose down
