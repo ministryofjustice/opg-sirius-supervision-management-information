@@ -6,7 +6,7 @@
 - [docker compose](https://docs.docker.com/compose/install/) (>= 2.26.0)
 
 #### Installing dependencies locally:
-(This is only necessary if running without docker)
+(This is only necessary if running without docker, you will need to be logged into sirius with a user who has `reporting user` permissions)
 
 - `yarn install`
 - `go mod download`
@@ -15,7 +15,6 @@
 ## Local development
 
 The application ran through Docker can be accessed on `localhost:7777/management-information/downloads`.
-
 To enable debugging and hot-reloading of Go files:
 
 `make up`
@@ -42,5 +41,5 @@ This will host at:
 `make cypress`
 
 ## Run the Cypress tests in UI
-`make dev-up` in one terminal (wait for the app to build)
+`make up` in one terminal (wait for the app to build)
 `npx cypress open baseUrl=http://localhost:7777/downloads` in another terminal
