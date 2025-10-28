@@ -14,22 +14,13 @@ For more advanced customisation, you can create your own Express middleware and 
 
 ## Middleware
 
-### Error Rerouter
+### User Permissions
 
-To allow us to test validation and error handling where we expect bad requests to be returned from the API, the `error-rerouter`
-middleware enables requests to be rerouted to an errors table in `db.json` and returned with a `400` status code.
-To add this to your Cypress test, simply set the `fail-route` cookie and add the expected error to the database, using
-the cookie's value as the id.
+To allow us to test different permissions validation the `switch-user`
+middleware enables requests to be rerouted to the users listed in `db.json`.
+We only expect users with a "Reporting User" permission to be able to view the pages.
+To add custom permissions use the `x-test-user-id` cookie, the default is set to be a user with the Reporting User permissions.
 
 e.g.:
-
-`cy.setCookie("fail-route", "notes")`
-
-This will reroute to `/errors/notes` and return the data stored in the `errors` object with the id `notes`.
-
----
-
-### Success Rerouter
-This is the same as above, except to handle successful requests that are hard to fit into the JSON model.
-Follow the same pattern as the error rerouter but use the `success-route` and put the data in the `successes` object.
-Please read the very helpful readme on the [json-server GitHub](https://github.com/typicode/json-serve) for more information.
+`cy.setCookie("x-test-user-id", reportingUser);`
+(in this example reportingUser is set to string "1")
