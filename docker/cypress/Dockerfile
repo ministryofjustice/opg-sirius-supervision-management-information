@@ -2,12 +2,11 @@ FROM cypress/included:14.5.4
 
 WORKDIR /root
 
-RUN npm install "cypress-failed-log@2.9.2"
-RUN npm install axe-core
-RUN npm install cypress-axe
+COPY cypress/package.json .
+COPY cypress/yarn.lock .
+RUN yarn install
 
 ENV CYPRESS_VIDEO=false
 ENV CYPRESS_baseUrl=http://management-information:7777/management-information
 
-COPY cypress.config.js .
-COPY cypress cypress
+COPY cypress .

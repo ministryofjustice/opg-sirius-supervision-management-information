@@ -2,11 +2,9 @@ const reportingUser = "1"
 
 describe("Navigation page", () => {
     beforeEach(() => {
-        cy.setCookie("XSRF-TOKEN", "abcde");
         cy.setCookie("x-test-user-id", reportingUser);
         cy.visit("/downloads");
     });
-
 
     describe("Tabs", () => {
         it("navigates between tabs correctly", () => {
