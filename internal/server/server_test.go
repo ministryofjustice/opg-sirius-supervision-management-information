@@ -34,5 +34,5 @@ type mockApiClient struct {
 }
 
 func (m mockApiClient) GetCurrentUserDetails(context api.Context) (model.User, error) {
-	return m.User, nil
+	return m.User, m.Error
 }

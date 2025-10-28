@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"errors"
 	"github.com/opg-sirius-supervision-management-information/internal/api"
 	"github.com/opg-sirius-supervision-management-information/internal/model"
@@ -10,11 +11,6 @@ import (
 	"strconv"
 	"testing"
 )
-
-type mockRouteData struct {
-	stuff string
-	AppVars
-}
 
 func TestRoute_htmxRequest_withPermissions(t *testing.T) {
 	tests := []struct {
@@ -29,16 +25,11 @@ func TestRoute_htmxRequest_withPermissions(t *testing.T) {
 		t.Run("Scenario "+strconv.Itoa(i), func(t *testing.T) {
 			client := mockApiClient{
 				User: model.User{
-					Id:          0,
-					Name:        "",
-					PhoneNumber: "",
-					Deleted:     false,
-					Email:       "",
-					Firstname:   "",
-					Surname:     "",
-					Roles:       test.userRoles,
-					Locked:      false,
-					Suspended:   false,
+					Id:      123,
+					Name:    "Test User",
+					Deleted: false,
+					Email:   "test@user.com",
+					Roles:   test.userRoles,
 				},
 			}
 			template := &mockTemplate{}
@@ -47,9 +38,8 @@ func TestRoute_htmxRequest_withPermissions(t *testing.T) {
 			r, _ := http.NewRequest(http.MethodGet, "", nil)
 			r.Header.Add("HX-Request", "true")
 
-			data := mockRouteData{
-				stuff:   "abc",
-				AppVars: AppVars{Path: "/path"},
+			data := PageData{
+				Data: "test data",
 			}
 
 			sut := route{client: client, tmpl: template, partial: "test"}
@@ -71,33 +61,37 @@ func TestRoute_fullPage_with_reportingUserPermissions(t *testing.T) {
 		expectError bool
 	}{
 		{userRoles: []string{"Case Manager"}, expectError: true},
+		{userRoles: []string{"Reporting User"}, expectError: false},
 		{userRoles: []string{"Reporting User", "Case Manager"}, expectError: false},
 		{userRoles: []string{"System Admin", "Reporting User", "Case Manager"}, expectError: false},
+		{userRoles: []string{"System Admin", "Case Manager", "Reporting User"}, expectError: false},
 		{userRoles: []string{""}, expectError: true},
 	}
 	for i, test := range tests {
 		t.Run("Scenario "+strconv.Itoa(i), func(t *testing.T) {
-			client := mockApiClient{}
+			client := mockApiClient{
+				User: model.User{
+					Id:        123,
+					Name:      "Test User",
+					Email:     "test@user.com",
+					Firstname: "Test",
+					Surname:   "User",
+					Roles:     test.userRoles,
+				},
+			}
 			template := &mockTemplate{}
 
 			w := httptest.NewRecorder()
-			ctx := api.Context{}
+			ctx := api.Context{
+				Context: context.Background(),
+			}
 			r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
 
-			client.User = model.User{
-				Id:    123,
-				Roles: test.userRoles,
-			}
-
 			data := PageData{
-				Data: mockRouteData{
-					stuff:   "abc",
-					AppVars: AppVars{Path: "/path/"},
-				},
+				Data: "test data",
 			}
 
 			sut := route{client: client, tmpl: template, partial: "test"}
-
 			err := sut.execute(w, r, data.Data)
 
 			if test.expectError {
@@ -115,27 +109,28 @@ func TestRoute_fullPage_with_reportingUserPermissions(t *testing.T) {
 	}
 }
 
-//func TestRoute_error(t *testing.T) {
-//	client := mockApiClient{}
-//	client.error = errors.New("it broke")
-//	template := &mockTemplate{}
-//
-//	w := httptest.NewRecorder()
-//	ctx := {}
-//	r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
-//	r.SetPathValue("clientId", "abc")
-//
-//	data := PageData{
-//		Data: mockRouteData{
-//			stuff:   "abc",
-//			AppVars: AppVars{Path: "/path/"},
-//		},
-//	}
-//
-//	sut := route{client: client, tmpl: template, partial: "test"}
-//
-//	err := sut.execute(w, r, data.Data)
-//
-//	assert.NotNil(t, err)
-//	assert.Equal(t, "it broke", err.Error())
-//}
+func TestRoute_error(t *testing.T) {
+	client := mockApiClient{
+		User: model.User{
+			Id:    123,
+			Name:  "Test User",
+			Roles: []string{"Reporting User"},
+		},
+		Error: errors.New("it broke"),
+	}
+	template := &mockTemplate{}
+	w := httptest.NewRecorder()
+	ctx := api.Context{
+		Context: context.Background(),
+	}
+	r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
+
+	data := PageData{
+		Data: "test Data",
+	}
+
+	sut := route{client: client, tmpl: template, partial: "test"}
+	err := sut.execute(w, r, data.Data)
+	assert.NotNil(t, err)
+	assert.Equal(t, "it broke", err.Error())
+}

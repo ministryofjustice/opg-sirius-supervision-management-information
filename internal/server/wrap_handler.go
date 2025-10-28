@@ -88,12 +88,8 @@ func wrapHandler(errTmpl Template, errPartial string, envVars EnvironmentVars) f
 				}
 
 				if err != nil {
-					if err.Error() == "not reporting user" {
-						http.Error(w, err.Error(), http.StatusForbidden)
-					} else {
-						logger.Error("failed to render error template", slog.String("err", err.Error()))
-						http.Error(w, err.Error(), http.StatusInternalServerError)
-					}
+					logger.Error("failed to render error template", slog.String("err", err.Error()))
+					http.Error(w, err.Error(), http.StatusInternalServerError)
 				}
 			}
 		})
