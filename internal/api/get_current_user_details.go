@@ -17,19 +17,19 @@ func (c *ApiClient) GetCurrentUserDetails(ctx Context) (model.User, error) {
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		c.logger.Error("Unable to get current user details due to error", "err", err)
+		c.logResponse(req, resp, err)
 		return v, err
 	}
 
 	defer unchecked(resp.Body.Close)
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		c.logger.Error("Unable to get current user details due to error", "err", err)
+		c.logResponse(req, resp, err)
 		return v, ErrUnauthorized
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		c.logger.Error("Unable to get current user details due to error", "err", err)
+		c.logResponse(req, resp, err)
 		return v, newStatusError(resp)
 	}
 

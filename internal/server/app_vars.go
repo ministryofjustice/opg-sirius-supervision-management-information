@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/opg-sirius-supervision-management-information/internal/api"
-	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"net/http"
 	"net/url"
 )
@@ -13,7 +12,6 @@ type AppVars struct {
 	Tabs            []Tab
 	EnvironmentVars EnvironmentVars
 	Error           string
-	User            model.User
 }
 
 type Tab struct {

@@ -4,6 +4,7 @@ import (
 	"github.com/opg-sirius-supervision-management-information/internal/api"
 	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"io"
+	"net/http"
 )
 
 type mockTemplate struct {
@@ -12,6 +13,25 @@ type mockTemplate struct {
 	lastVars         interface{}
 	lastW            io.Writer
 	error            error
+}
+
+type mockRoute struct {
+	client   ApiClient
+	data     any
+	executed bool
+	lastW    io.Writer
+	error
+}
+
+func (r *mockRoute) Client() ApiClient {
+	return r.client
+}
+
+func (r *mockRoute) execute(w http.ResponseWriter, req *http.Request, data any) error {
+	r.executed = true
+	r.lastW = w
+	r.data = data
+	return r.error
 }
 
 func (m *mockTemplate) Execute(w io.Writer, vars any) error {
