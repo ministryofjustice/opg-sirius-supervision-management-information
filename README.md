@@ -1,2 +1,45 @@
 # opg-sirius-supervision-management-information
-OPG sirius supervision management information: Managed by opg-org-infra &amp; Terraform
+
+### Major dependencies
+
+- [Go](https://golang.org/) (>= 1.22)
+- [docker compose](https://docs.docker.com/compose/install/) (>= 2.26.0)
+
+#### Installing dependencies locally:
+(This is only necessary if running without docker, you will need to be logged into sirius with a user who has `reporting user` permissions)
+
+- `yarn install`
+- `go mod download`
+---
+
+## Local development
+
+The application ran through Docker can be accessed on `localhost:7777/management-information/downloads`.
+To enable debugging and hot-reloading of Go files:
+
+`make up`
+
+Hot-reloading is managed independently and should happen seamlessly. Hot-reloading for web assets (JS, CSS, etc.)
+is also provided via a Yarn watch command.
+
+-----
+
+Running without docker with:
+`yarn install && yarn build`
+`go run main.go`
+
+This will host at:
+`localhost:7777/downloads`.
+
+-----
+## Run the unit tests
+
+`make test`
+
+## Run the Cypress tests not in UI
+`make build-all`
+`make cypress`
+
+## Run the Cypress tests in UI
+`make up` in one terminal (wait for the app to build)
+`npx cypress open baseUrl=http://localhost:7777/downloads` in another terminal

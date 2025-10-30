@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "@cypress/grep": "^5.0.0",
+    "axe-core": "^4.9.1",
+    "cypress": "^15.0.0",
+    "cypress-axe": "^1.5.0",
+    "cypress-failed-log": "^2.10.0",
+    "typescript": "^5.5.3"
+  }
+}

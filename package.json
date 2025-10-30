@@ -1,0 +1,31 @@
+{
+  "name": "opg-sirius-supervision-management-information",
+  "version": "0.1.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn build:js && yarn build:css",
+    "build:js": "esbuild --bundle web/assets/main.js --minify --outfile=web/static/javascript/all.js --sourcemap --resolve-extensions=.mjs,.js",
+    "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
+    "clean": "rm -rf web/static",
+    "test": "cd internal && go test",
+    "cypress": "cypress open",
+    "cypress-ci": "cypress open -c baseUrl=http://localhost:8080",
+    "lint": "eslint ./web/assets/javascript"
+  },
+  "dependencies": {
+    "@ministryofjustice/frontend": "^2.1.3",
+    "govuk-frontend": "^5.4.1",
+    "opg-sirius-header": "ministryofjustice/opg-sirius-header#semver:v0.52.7",
+    "htmx.org": "^2.0.0"
+  },
+  "devDependencies": {
+    "axe-core": "^4.9.1",
+    "cypress": "^13.13.1",
+    "cypress-axe": "^1.5.0",
+    "cypress-failed-log": "^2.10.0",
+    "typescript": "^5.5.3",
+    "esbuild": "^0.23.0",
+    "eslint": "^9.8.0",
+    "sass": "^1.77.8"
+  }
+}
