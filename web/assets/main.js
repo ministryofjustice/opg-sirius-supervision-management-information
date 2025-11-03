@@ -9,3 +9,66 @@ initAll();
 window.htmx = htmx
 htmx.logAll();
 htmx.config.responseHandling = [{code:".*", swap: true}]
+
+const formToggler = (suffix) => {
+    return {
+        resetAll: resetAll(suffix),
+        show: show(suffix),
+    }
+}
+
+const resetAll = (suffix) => () => {
+    htmx.findAll(`[id$="-${suffix}"]`).forEach(element => {
+        htmx.addClass(element, "hide");
+        const input = element.querySelector("input");
+        if (input) {
+            input.setAttribute("disabled", "true");
+            input.removeAttribute("max");
+        }
+    });
+}
+
+const show = (suffix) => (idName) => {
+    document.querySelector(`#${idName}`).removeAttribute("disabled");
+    htmx.removeClass(htmx.find(`#${idName}-${suffix}`), "hide")
+}
+
+// adding event listeners inside the onLoad function will ensure they are re-added to partial content when loaded back in
+htmx.onLoad(content => {
+    initAll();
+
+    if (document.getElementById('upload-type')) {
+        const toggle = formToggler("field-input")
+        htmx.find("#upload-type").addEventListener("change", () => {
+            const uploadTypeEl = document.getElementById('upload-type');
+            const uploadType = uploadTypeEl.value;
+            toggle.resetAll();
+            document.querySelector("form").reset();
+            uploadTypeEl.value = uploadType;
+
+            switch (uploadType) {
+                case "Bonds":
+                    toggle.show("bond-provider");
+                    break;
+            }
+        });
+
+        htmx.find('#bond-provider').addEventListener("change", () => {
+            const uploadTypeEl = document.getElementById('upload-type');
+            const uploadType = uploadTypeEl.value;
+            const bondProviderEl = document.getElementById('bond-provider');
+            const bondProvider = bondProviderEl.value;
+
+            toggle.resetAll();
+            document.querySelector("form").reset();
+            uploadTypeEl.value = uploadType;
+            bondProviderEl.value = bondProvider;
+
+            toggle.show('bond-provider');
+
+            if (bondProvider !== ""){
+                toggle.show("file-upload");
+            }
+        })
+    }
+});

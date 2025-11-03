@@ -14,6 +14,7 @@ import (
 
 type ApiClient interface {
 	GetCurrentUserDetails(api.Context) (model.User, error)
+	GetBondProviders(api.Context) ([]model.BondProvider, error)
 }
 
 type router interface {
