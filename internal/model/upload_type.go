@@ -7,7 +7,8 @@ var UploadTypes = []UploadType{
 type UploadType int
 
 const (
-	UploadTypeBonds UploadType = iota
+	UploadTypeUnknown UploadType = iota
+	UploadTypeBonds
 )
 
 var uploadTypeMap = map[string]UploadType{
@@ -35,3 +36,13 @@ func (u UploadType) Key() string {
 		return ""
 	}
 }
+
+func ParseUploadType(s string) UploadType {
+	value, ok := uploadTypeMap[s]
+	if !ok {
+		return UploadType(0)
+	}
+	return value
+}
+
+func (u UploadType) Valid() bool { return u != UploadTypeUnknown }

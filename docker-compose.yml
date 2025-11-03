@@ -8,8 +8,8 @@ services:
       - "7777:7777"
     environment:
       PORT: 7777
-      PREFIX: /management-information
-      HEALTHCHECK: /management-information/health-check
+      PREFIX: /supervision/management-information
+      HEALTHCHECK: /supervision/management-information/health-check
       SIRIUS_PUBLIC_URL: http://localhost:8080
       SIRIUS_URL: http://json-server:3000
     depends_on:
