@@ -39,6 +39,8 @@ func New(logger *slog.Logger, client ApiClient, templates map[string]*template.T
 	handleMux("GET /downloads", &GetDownloadsHandler{&route{client: client, tmpl: templates["downloads.gotmpl"], partial: "downloads"}})
 	handleMux("GET /uploads", &GetUploadsHandler{&route{client: client, tmpl: templates["uploads.gotmpl"], partial: "uploads"}})
 
+	handleMux("POST /uploads", &UploadFileHandler{&route{client: client, tmpl: templates["uploads.gotmpl"], partial: "error-summary"}})
+
 	mux.Handle("/health-check", healthCheck())
 	mux.Handle("/", http.RedirectHandler(envVars.Prefix+"/downloads", http.StatusFound))
 

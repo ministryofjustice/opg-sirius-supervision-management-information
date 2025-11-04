@@ -42,6 +42,7 @@ htmx.onLoad(content => {
         htmx.find("#upload-type").addEventListener("change", () => {
             const uploadTypeEl = document.getElementById('upload-type');
             const uploadType = uploadTypeEl.value;
+
             toggle.resetAll();
             document.querySelector("form").reset();
             uploadTypeEl.value = uploadType;
@@ -68,6 +69,25 @@ htmx.onLoad(content => {
 
             if (bondProvider !== ""){
                 toggle.show("file-upload");
+            }
+        })
+    }
+
+    // validation errors are loaded in as a partial, with oob-swaps for the field error messages,
+    // but classes need to be applied to each form group that appears in the summary
+    const errorSummary = htmx.find("#error-summary");
+    if (errorSummary) {
+        const errors = [];
+        errorSummary.querySelectorAll(".govuk-link").forEach((element) => {
+            errors.push(element.getAttribute("href"));
+        });
+        htmx.findAll(".govuk-form-group").forEach((element) => {
+            if (errors.includes(`#${element.id}`)) {
+                element.classList.add("govuk-form-group--error");
+                element.querySelector('.govuk-error-message')?.classList.remove('hide');
+            } else {
+                element.classList.remove("govuk-form-group--error");
+                element.querySelector('.govuk-error-message')?.classList.add('hide');
             }
         })
     }
