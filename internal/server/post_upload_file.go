@@ -36,7 +36,7 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 
 	if !uploadType.Valid() {
 		data.ValidationErrors = model.ValidationErrors{
-			"UploadType": map[string]string{"required": "Unrecognised upload type"},
+			"UploadType": map[string]string{"required": "Please select a report to upload"},
 		}
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return h.execute(w, r, data)
