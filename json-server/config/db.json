@@ -33,5 +33,19 @@
       ],
       "surname": "manager"
     }
+  ],
+  "bond-providers" : [
+    {
+      "id": 1,
+      "name": "Marsh"
+    },
+    {
+      "id": 2,
+      "name": "Howden"
+    },
+    {
+      "id": 3,
+      "name": "DBS"
+    }
   ]
 }

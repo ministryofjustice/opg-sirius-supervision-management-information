@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/opg-sirius-supervision-management-information/internal/model"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -8,7 +9,12 @@ import (
 )
 
 func TestGetUploads(t *testing.T) {
-	client := mockApiClient{}
+	client := mockApiClient{
+		BondProviders: []model.BondProvider{
+			{Id: 1, Name: "Provider A"},
+			{Id: 2, Name: "Provider B"},
+		},
+	}
 	ro := &mockRoute{client: client}
 
 	w := httptest.NewRecorder()
@@ -35,6 +41,11 @@ func TestGetUploads(t *testing.T) {
 	assert.True(t, ro.executed)
 
 	expected := UploadsVars{
+		model.UploadTypes,
+		[]model.BondProvider{
+			{Id: 1, Name: "Provider A"},
+			{Id: 2, Name: "Provider B"},
+		},
 		appVars,
 	}
 	assert.Equal(t, expected, ro.data)
