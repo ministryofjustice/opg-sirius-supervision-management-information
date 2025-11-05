@@ -1,6 +1,6 @@
 const reportingUser = "1"
 
-describe("Navigation page", () => {
+describe("Upload page", () => {
     beforeEach(() => {
         cy.setCookie("x-test-user-id", reportingUser);
         cy.visit("uploads");
