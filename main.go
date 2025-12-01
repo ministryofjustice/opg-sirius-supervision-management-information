@@ -6,7 +6,9 @@ import (
 	"github.com/ministryofjustice/opg-go-common/paginate"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/internal/filestorage"
 	"github.com/opg-sirius-supervision-management-information/internal/server"
+	"github.com/opg-sirius-supervision-management-information/internal/service"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
 	"log/slog"
@@ -37,6 +39,15 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	httpClient.Transport = otelhttp.NewTransport(httpClient.Transport)
 
 	envVars := server.NewEnvironmentVars()
+
+	fileStorageClient, err := filestorage.NewClient(
+		ctx,
+		envVars.AwsRegion,
+		envVars.IamRole,
+		envVars.S3Endpoint,
+		envVars.S3EncryptionKey,
+	)
+
 	client, err := api.NewApiClient(http.DefaultClient, envVars.SiriusURL+supervisionAPIPath, logger)
 	if err != nil {
 		logger.Error("Error creating new Api Client", "error", err)
