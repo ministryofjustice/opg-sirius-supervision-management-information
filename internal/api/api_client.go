@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/opg-sirius-supervision-management-information/internal/filestorage"
 	"io"
 	"log/slog"
 	"net/http"
@@ -61,11 +62,13 @@ func (e ClientError) Error() string {
 	return string(e)
 }
 
-func NewApiClient(httpClient HTTPClient, baseURL string, logger *slog.Logger) (*ApiClient, error) {
+func NewApiClient(httpClient HTTPClient, baseURL string, fileStorageClient filestorage.Client, asyncBucket string, logger *slog.Logger) (*ApiClient, error) {
 	return &ApiClient{
-		http:    httpClient,
-		baseURL: baseURL,
-		logger:  logger,
+		http:        httpClient,
+		baseURL:     baseURL,
+		fileStorage: fileStorageClient,
+		logger:      logger,
+		asyncBucket: asyncBucket,
 	}, nil
 }
 
@@ -74,9 +77,11 @@ type HTTPClient interface {
 }
 
 type ApiClient struct {
-	http    HTTPClient
-	baseURL string
-	logger  *slog.Logger
+	http        HTTPClient
+	baseURL     string
+	logger      *slog.Logger
+	fileStorage filestorage.Client
+	asyncBucket string
 }
 
 func (c *ApiClient) newRequest(ctx Context, method, path string, body io.Reader) (*http.Request, error) {

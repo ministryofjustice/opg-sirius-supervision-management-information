@@ -15,6 +15,7 @@ import (
 type ApiClient interface {
 	GetCurrentUserDetails(api.Context) (model.User, error)
 	GetBondProviders(api.Context) ([]model.BondProvider, error)
+	ProcessDirectUpload(api.Context, string, io.Reader) error
 }
 
 type router interface {
@@ -28,7 +29,6 @@ type Template interface {
 }
 
 func New(logger *slog.Logger, client ApiClient, templates map[string]*template.Template, envVars EnvironmentVars) http.Handler {
-
 	mux := http.NewServeMux()
 
 	handleMux := func(pattern string, h Handler) {

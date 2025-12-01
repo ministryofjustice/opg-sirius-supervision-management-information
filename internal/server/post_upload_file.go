@@ -1,7 +1,10 @@
 package server
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/opg-sirius-supervision-management-information/internal/model"
+	"io"
 	"net/http"
 )
 
@@ -52,6 +55,20 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return h.execute(w, r, data)
 		}
+
+		file, handler, err := r.FormFile("fileUpload")
+		if err != nil {
+
+			return err
+		}
+
+		defer file.Close()
+
+		fileData, err := io.ReadAll(file)
+
+		fmt.Println("Validation ok!")
+		fileBytes := bytes.NewReader(fileData)
+		err = h.router.Client().ProcessDirectUpload(ctx, handler.Filename, fileBytes)
 	}
 	return h.execute(w, r, data)
 }

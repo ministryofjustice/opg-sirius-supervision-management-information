@@ -8,7 +8,6 @@ import (
 	"github.com/opg-sirius-supervision-management-information/internal/api"
 	"github.com/opg-sirius-supervision-management-information/internal/filestorage"
 	"github.com/opg-sirius-supervision-management-information/internal/server"
-	"github.com/opg-sirius-supervision-management-information/internal/service"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
 	"log/slog"
@@ -47,8 +46,12 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		envVars.S3Endpoint,
 		envVars.S3EncryptionKey,
 	)
+	if err != nil {
+		logger.Error("Error creating new File Storage Client", "error", err)
+		return err
+	}
 
-	client, err := api.NewApiClient(http.DefaultClient, envVars.SiriusURL+supervisionAPIPath, logger)
+	client, err := api.NewApiClient(http.DefaultClient, envVars.SiriusURL+supervisionAPIPath, *fileStorageClient, envVars.AsyncBucket, logger)
 	if err != nil {
 		logger.Error("Error creating new Api Client", "error", err)
 	}
