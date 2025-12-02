@@ -61,3 +61,8 @@ func (m mockApiClient) GetCurrentUserDetails(context api.Context) (model.User, e
 func (m mockApiClient) GetBondProviders(context api.Context) ([]model.BondProvider, error) {
 	return m.BondProviders, m.Error
 }
+
+func (m mockApiClient) ProcessDirectUpload(context api.Context, fileName string, fileBytes io.Reader) (error) {
+	return m.Error
+}
+

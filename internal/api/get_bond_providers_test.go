@@ -12,7 +12,9 @@ import (
 
 func TestGetBondProviders(t *testing.T) {
 	logger, mockClient := SetUpTest()
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger)
+	mockS3 := MockFileStorage{}
+
+	client, _ := NewApiClient(&mockClient, "http://localhost:3000", &mockS3, "", logger)
 
 	json := `[{
 			  "id": 1,
@@ -50,7 +52,9 @@ func TestGetBondProviders(t *testing.T) {
 
 func TestGetBondProvidersUnauthorised(t *testing.T) {
 	logger, mockClient := SetUpTest()
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger)
+	mockS3 := MockFileStorage{}
+
+	client, _ := NewApiClient(&mockClient, "http://localhost:3000", &mockS3, "", logger)
 
 	mocks.GetDoFunc = func(*http.Request) (*http.Response, error) {
 		return &http.Response{

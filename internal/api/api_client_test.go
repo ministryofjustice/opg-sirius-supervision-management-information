@@ -5,12 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/opg-sirius-supervision-management-information/internal/mocks"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/opg-sirius-supervision-management-information/internal/mocks"
 
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/stretchr/testify/assert"
@@ -111,4 +113,12 @@ func TestLogResponseIgnoresContextCanceled(t *testing.T) {
 
 	assert.Equal(t, "INFO", logEntries[0].Level)
 	assert.Equal(t, "method: POST, url: /my-page, response: 200", logEntries[0].Message)
+}
+
+type MockFileStorage struct {
+	err        error
+}
+
+func (m *MockFileStorage) StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error) {
+	return nil, m.err
 }

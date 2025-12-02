@@ -51,7 +51,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	client, err := api.NewApiClient(http.DefaultClient, envVars.SiriusURL+supervisionAPIPath, *fileStorageClient, envVars.AsyncBucket, logger)
+	client, err := api.NewApiClient(http.DefaultClient, envVars.SiriusURL+supervisionAPIPath, fileStorageClient, envVars.AsyncBucket, logger)
 	if err != nil {
 		logger.Error("Error creating new Api Client", "error", err)
 	}
