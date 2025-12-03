@@ -62,13 +62,25 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 			return err
 		}
 
-		defer file.Close()
+		defer func() {
+            if err := file.Close(); err != nil {
+                fmt.Println("Error closing file:", err)
+            }
+        }()
 
 		fileData, err := io.ReadAll(file)
+
+		if err != nil {
+            return err
+        }
 
 		fmt.Println("Validation ok!")
 		fileBytes := bytes.NewReader(fileData)
 		err = h.router.Client().ProcessDirectUpload(ctx, handler.Filename, fileBytes)
+
+		if err != nil {
+            return err
+        }
 	}
 	return h.execute(w, r, data)
 }
