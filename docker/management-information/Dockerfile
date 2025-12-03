@@ -65,6 +65,7 @@ FROM scratch AS prod
 
 COPY --from=base /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=base /etc/ca-certificates* /etc/
+COPY --from=base /etc/ssl/* /etc/
 COPY --from=base /usr/share/ca-certificates/ /usr/share/ca-certificates/
 COPY --from=base /etc/passwd /etc/passwd
 COPY --from=base /etc/group /etc/group
