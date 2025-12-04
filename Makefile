@@ -34,7 +34,7 @@ clean:
 	docker compose run --rm yarn
 
 up: clean build-dev
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information management-information-api yarn
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information management-information-api localstack yarn
 
 down:
 	docker compose down

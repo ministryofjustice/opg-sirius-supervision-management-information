@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -17,9 +16,6 @@ import (
 )
 
 func main() {
-
-	fmt.Println("Hey we're in the main function")
-
 	ctx := context.Background()
 	logger := telemetry.NewLogger("opg-sirius-supervision-management-information-api")
 
@@ -31,7 +27,6 @@ func main() {
 }
 
 func run(ctx context.Context, logger *slog.Logger) error {
-	fmt.Println("Hey we're in the run function")
 	exportTraces := os.Getenv("TRACING_ENABLED") == "1"
 	shutdown, err := telemetry.StartTracerProvider(ctx, logger, exportTraces)
 	defer shutdown()
@@ -40,14 +35,14 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	}
 
 	envs := &service.Envs{
-		Port: os.Getenv("PORT"),
-		AwsRegion: os.Getenv("AWS_REGION"),
-		IamRole: os.Getenv("IAM_ROLE"),
-		S3Endpoint: os.Getenv("S3_ENDPOINT"),
+		Port:            os.Getenv("PORT"),
+		AwsRegion:       os.Getenv("AWS_REGION"),
+		IamRole:         os.Getenv("IAM_ROLE"),
+		S3Endpoint:      os.Getenv("S3_ENDPOINT"),
 		S3EncryptionKey: os.Getenv("S3_ENCRYPTION_KEY"),
+		AsyncBucket:     os.Getenv("ASYNC_BUCKET"),
 	}
 
-    //creates new instance of filestorage client and uses stuff from env vars
 	fileStorageClient, err := filestorage.NewClient(
 		ctx,
 		envs.AwsRegion,
@@ -60,7 +55,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	// creates a new service 
+	// creates a new service
 	Service := service.NewService(fileStorageClient, envs)
 
 	//validator, err := validation.New()

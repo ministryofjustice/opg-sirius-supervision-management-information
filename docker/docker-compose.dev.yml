@@ -22,6 +22,7 @@ services:
       - ./management-information-api/.air.toml:/app/management-information-api/.air.toml
       - ./management-information-api/main.go:/app/management-information-api/main.go
       - ./management-information-api/cmd:/app/management-information-api/cmd
+      - ./management-information-api/internal:/app/management-information-api/internal
       - ./go.mod:/app/go.mod
       - ./go.sum:/app/go.sum
 

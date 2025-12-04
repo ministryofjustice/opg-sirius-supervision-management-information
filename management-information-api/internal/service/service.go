@@ -14,27 +14,27 @@ type FileStorage interface {
 }
 
 type Envs struct {
-	Port string
-	AwsRegion string
-	IamRole string
-	S3Endpoint string
+	Port            string
+	AwsRegion       string
+	IamRole         string
+	S3Endpoint      string
 	S3EncryptionKey string
-	AsyncBucket string
+	AsyncBucket     string
 }
 
 type Service struct {
 	fileStorage FileStorage
-	env         *Envs
+	envs        *Envs
 }
 
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func NewService(fileStorage FileStorage, env *Envs) *Service {
+func NewService(fileStorage FileStorage, envs *Envs) *Service {
 	return &Service{
 		fileStorage: fileStorage,
-		env:         env,
+		envs:        envs,
 	}
 }
 

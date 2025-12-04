@@ -11,7 +11,7 @@ func (s *Service) ProcessDirectUpload(ctx context.Context, filename string, file
 
 	filePath := fmt.Sprintf("%s/%s", directory, filename)
 
-	_, err := s.fileStorage.StreamFile(ctx, s.env.AsyncBucket, filePath, io.NopCloser(fileBytes))
+	_, err := s.fileStorage.StreamFile(ctx, s.envs.AsyncBucket, filePath, io.NopCloser(fileBytes))
 	if err != nil {
 		return err
 	}
