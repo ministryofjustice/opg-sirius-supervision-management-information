@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-func (c *ApiClient) ProcessDirectUpload(ctx Context, filename string, fileBytes io.Reader) error {
+func (c *ApiClient) Upload(ctx Context, filename string, fileBytes io.Reader) error {
 	// get directory based on upload type?
 
 	// Hit api endpoint

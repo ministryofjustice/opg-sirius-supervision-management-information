@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/opg-sirius-supervision-management-information/internal/mocks"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
 
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/stretchr/testify/assert"

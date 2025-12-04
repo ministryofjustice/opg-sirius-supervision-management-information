@@ -76,7 +76,7 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 
 		fmt.Println("Validation ok!")
 		fileBytes := bytes.NewReader(fileData)
-		err = h.router.Client().ProcessDirectUpload(ctx, handler.Filename, fileBytes)
+		err = h.router.Client().Upload(ctx, handler.Filename, fileBytes)
 
 		if err != nil {
             return err

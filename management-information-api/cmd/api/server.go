@@ -20,16 +20,12 @@ type FileStorage interface {
 
 type Server struct {
 	service     Service
-	fileStorage FileStorage
-	envs        *Envs
 }
 
-type Envs struct {
-	Port string
-}
-
-func NewServer(envs Envs) *Server {
-	return &Server{envs: &envs}
+func NewServer(service Service) *Server {
+	return &Server{
+		service: service,
+	}
 }
 
 func (s *Server) SetupRoutes(logger *slog.Logger) http.Handler {

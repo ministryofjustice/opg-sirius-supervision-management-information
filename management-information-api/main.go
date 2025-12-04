@@ -3,14 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/ministryofjustice/opg-go-common/telemetry"
-	"github.com/opg-sirius-supervision-management-information/management-information-api/cmd/api"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/ministryofjustice/opg-go-common/telemetry"
+	"github.com/opg-sirius-supervision-management-information/management-information-api/cmd/api"
+	"github.com/opg-sirius-supervision-management-information/management-information-api/internal/filestorage"
+	"github.com/opg-sirius-supervision-management-information/management-information-api/internal/service"
 )
 
 func main() {
@@ -36,32 +39,36 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	envs := &api.Envs{
+	envs := &service.Envs{
 		Port: os.Getenv("PORT"),
+		AwsRegion: os.Getenv("AWS_REGION"),
+		IamRole: os.Getenv("IAM_ROLE"),
+		S3Endpoint: os.Getenv("S3_ENDPOINT"),
+		S3EncryptionKey: os.Getenv("S3_ENCRYPTION_KEY"),
 	}
 
-	//fileStorageClient, err := filestorage.NewClient(
-	//	ctx,
-	//	envs.awsRegion,
-	//	envs.iamRole,
-	//	envs.s3Endpoint,
-	//	envs.s3EncryptionKey,
-	//)
+    //creates new instance of filestorage client and uses stuff from env vars
+	fileStorageClient, err := filestorage.NewClient(
+		ctx,
+		envs.AwsRegion,
+		envs.IamRole,
+		envs.S3Endpoint,
+		envs.S3EncryptionKey,
+	)
 
-	//if err != nil {
-	//	return err
-	//}
+	if err != nil {
+		return err
+	}
 
-	//Service := service.NewService(dbPool, eventClient, fileStorageClient, notifyClient, allpayClient, govUKClient, &service.Env{
-	//	AsyncBucket: envs.asyncBucket,
-	//})
+	// creates a new service 
+	Service := service.NewService(fileStorageClient, envs)
 
 	//validator, err := validation.New()
 	//if err != nil {
 	//	return err
 	//}
 
-	server := api.NewServer(*envs)
+	server := api.NewServer(Service)
 
 	s := &http.Server{
 		Addr:              ":" + envs.Port,

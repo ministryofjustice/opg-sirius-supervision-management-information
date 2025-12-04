@@ -15,7 +15,7 @@ import (
 type ApiClient interface {
 	GetCurrentUserDetails(api.Context) (model.User, error)
 	GetBondProviders(api.Context) ([]model.BondProvider, error)
-	ProcessDirectUpload(api.Context, string, io.Reader) error
+	Upload(api.Context, string, io.Reader) error
 }
 
 type router interface {

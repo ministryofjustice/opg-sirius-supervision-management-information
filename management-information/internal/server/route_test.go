@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"errors"
-	"github.com/opg-sirius-supervision-management-information/internal/api"
-	"github.com/opg-sirius-supervision-management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
