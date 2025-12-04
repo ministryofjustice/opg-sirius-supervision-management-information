@@ -2,8 +2,8 @@ package api
 
 import (
 	"bytes"
-	"github.com/opg-sirius-supervision-management-information/internal/mocks"
-	"github.com/opg-sirius-supervision-management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"

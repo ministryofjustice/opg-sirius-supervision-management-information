@@ -4,13 +4,14 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn build:js && yarn build:css",
-    "build:js": "esbuild --bundle web/assets/main.js --minify --outfile=web/static/javascript/all.js --sourcemap --resolve-extensions=.mjs,.js",
-    "build:css": "sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
+    "build:js": "node_modules/.bin/esbuild --bundle web/assets/main.js --minify --outfile=web/static/javascript/all.js --sourcemap --resolve-extensions=.mjs,.js",
+    "build:css": "node_modules/.bin/sass --load-path . --style compressed web/assets/main.scss web/static/stylesheets/all.css",
     "clean": "rm -rf web/static",
     "test": "cd internal && go test",
-    "cypress": "cypress open",
-    "cypress-ci": "cypress open -c baseUrl=http://localhost:8080",
-    "lint": "eslint ./web/assets/javascript"
+    "cypress": "node_modules/.bin/cypress open",
+    "cypress-ci": "node_modules/.bin/cypress open -c baseUrl=http://localhost:8080",
+    "lint": "node_modules/.bin/eslint web/assets/javascript",
+    "watch": "yarn build:css && yarn build:js --watch=forever"
   },
   "dependencies": {
     "@ministryofjustice/frontend": "^2.1.3",

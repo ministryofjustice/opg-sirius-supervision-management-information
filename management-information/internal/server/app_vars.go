@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/opg-sirius-supervision-management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
 	"net/http"
 	"net/url"
 )

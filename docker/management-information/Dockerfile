@@ -21,9 +21,9 @@ WORKDIR /app
 
 RUN mkdir -p web/static
 
-COPY web/assets web/assets
-COPY package.json .
-COPY yarn.lock .
+COPY management-information/web/assets web/assets
+COPY management-information/package.json .
+COPY management-information/yarn.lock .
 
 RUN yarn install
 RUN yarn build
@@ -38,7 +38,7 @@ WORKDIR /app/healthcheck
 RUN go build -a -installsuffix cgo -o /go/bin/healthcheck
 
 FROM base AS dev
-WORKDIR /app
+WORKDIR /app/management-information
 
 COPY --from=asset-env /app/web/static web/static
 COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
@@ -54,10 +54,11 @@ WORKDIR /app
 
 COPY go.mod .
 COPY go.sum .
+COPY management-information management-information
 
 RUN go mod download
 
-COPY . .
+WORKDIR /app/management-information
 
 RUN go build -a -installsuffix cgo -o /go/bin/management-information
 
@@ -71,7 +72,7 @@ COPY --from=base /etc/passwd /etc/passwd
 COPY --from=base /etc/group /etc/group
 
 COPY --from=build-env /go/bin/management-information management-information
-COPY --from=build-env /app/web/template web/template
+COPY --from=build-env /app/management-information/web/template web/template
 COPY --from=asset-env /app/web/static web/static
 COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
 

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/opg-sirius-supervision-management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
-	"github.com/opg-sirius-supervision-management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

@@ -3,7 +3,7 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"github.com/opg-sirius-supervision-management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
 	"io"
 	"net/http"
 )

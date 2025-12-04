@@ -66,4 +66,4 @@ services:
     working_dir: /home/node/app
     entrypoint: yarn
     volumes:
-      - ./:/home/node/app
+      - ./management-information:/home/node/app
