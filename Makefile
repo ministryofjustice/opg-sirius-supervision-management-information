@@ -14,13 +14,13 @@ gosec: setup-directories
 	docker compose run --rm gosec
 
 build:
-	docker compose build --no-cache --parallel management-information
+	docker compose build --no-cache --parallel management-information management-information-api
 
 build-dev:
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --no-cache --parallel management-information yarn json-server
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --no-cache --parallel management-information management-information-api yarn json-server
 
 build-all:
-	docker compose build --parallel management-information json-server cypress
+	docker compose build --parallel management-information management-information-api json-server cypress
 
 test: setup-directories
 	go run gotest.tools/gotestsum@latest --format testname  --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
@@ -34,7 +34,7 @@ clean:
 	docker compose run --rm yarn
 
 up: clean build-dev
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information yarn
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information management-information-api yarn
 
 down:
 	docker compose down

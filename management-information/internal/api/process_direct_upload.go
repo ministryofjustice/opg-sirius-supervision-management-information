@@ -7,17 +7,24 @@ import (
 
 func (c *ApiClient) ProcessDirectUpload(ctx Context, filename string, fileBytes io.Reader) error {
 	// get directory based on upload type?
-	directory := "bonds-without-orders"
 
-	filePath := directory + "/" + filename
+	// Hit api endpoint
 
-	fmt.Println(filename)
-
-	fmt.Println("Starting stream upload to file storage at path:", filePath)
-	_, err := c.fileStorage.StreamFile(ctx, c.asyncBucket, filePath, io.NopCloser(fileBytes))
+	req, err := c.newBackendRequest(ctx, "POST", "/uploads", fileBytes)
 	if err != nil {
 		return err
 	}
+
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	_, err = c.http.Do(req)
+	if err != nil {
+		return err
+	}
+
 	fmt.Println("It worked!")
 	return nil
 }

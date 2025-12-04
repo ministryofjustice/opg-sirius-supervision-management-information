@@ -12,6 +12,22 @@ services:
       HEALTHCHECK: /management-information/health-check
       SIRIUS_PUBLIC_URL: http://localhost:8080
       SIRIUS_URL: http://json-server:3000
+      BACKEND_URL: http://management-information-api:7171
+    depends_on:
+      json-server:
+        condition: service_started
+
+  management-information-api:
+    build:
+      dockerfile: docker/management-information-api/Dockerfile
+      target: prod
+    ports:
+      - "7171:7171"
+    environment:
+      PORT: 7171
+      HEALTHCHECK: /management-information/health-check
+      SIRIUS_PUBLIC_URL: http://localhost:8080
+      SIRIUS_URL: http://json-server:3000
     depends_on:
       json-server:
         condition: service_started

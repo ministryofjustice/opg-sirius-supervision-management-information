@@ -52,8 +52,7 @@ ENTRYPOINT ["air"]
 FROM base AS build-env
 WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
 COPY management-information management-information
 
 RUN go mod download

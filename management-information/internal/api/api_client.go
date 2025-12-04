@@ -61,13 +61,12 @@ func (e ClientError) Error() string {
 	return string(e)
 }
 
-func NewApiClient(httpClient HTTPClient, baseURL string, fileStorageClient FileStorageInterface, asyncBucket string, logger *slog.Logger) (*ApiClient, error) {
+func NewApiClient(httpClient HTTPClient, baseURL string, logger *slog.Logger, backendURL string) (*ApiClient, error) {
 	return &ApiClient{
-		http:        httpClient,
-		baseURL:     baseURL,
-		fileStorage: fileStorageClient,
-		logger:      logger,
-		asyncBucket: asyncBucket,
+		http:       httpClient,
+		baseURL:    baseURL,
+		logger:     logger,
+		BackendURL: backendURL,
 	}, nil
 }
 
@@ -76,16 +75,14 @@ type HTTPClient interface {
 }
 
 type FileStorageInterface interface {
-	StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error) 
+	StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error)
 }
 
-
 type ApiClient struct {
-	http        HTTPClient
-	baseURL     string
-	logger      *slog.Logger
-	fileStorage FileStorageInterface
-	asyncBucket string
+	http       HTTPClient
+	baseURL    string
+	logger     *slog.Logger
+	BackendURL string
 }
 
 func (c *ApiClient) newRequest(ctx Context, method, path string, body io.Reader) (*http.Request, error) {
@@ -100,6 +97,17 @@ func (c *ApiClient) newRequest(ctx Context, method, path string, body io.Reader)
 
 	req.Header.Add("OPG-Bypass-Membrane", "1")
 	req.Header.Add("X-XSRF-TOKEN", ctx.XSRFToken)
+
+	return req, err
+}
+
+func (c *ApiClient) newBackendRequest(ctx Context, method, path string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx.Context, method, c.BackendURL+path, body)
+	if err != nil {
+		return nil, err
+	}
+
+	//req.Header.Add("Authorization", "Bearer " . c.jwt.)
 
 	return req, err
 }

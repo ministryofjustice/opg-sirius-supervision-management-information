@@ -14,7 +14,7 @@ type EnvironmentVars struct {
 	IamRole         string
 	S3Endpoint      string
 	S3EncryptionKey string
-	AsyncBucket     string
+	BackendURL      string
 }
 
 func NewEnvironmentVars() EnvironmentVars {
@@ -28,7 +28,7 @@ func NewEnvironmentVars() EnvironmentVars {
 		IamRole:         getEnv("AWS_IAM_ROLE", ""),
 		S3Endpoint:      getEnv("AWS_S3_ENDPOINT", ""),
 		S3EncryptionKey: getEnv("S3_ENCRYPTION_KEY", ""),
-		AsyncBucket:     getEnv("ASYNC_S3_BUCKET", ""),
+		BackendURL:      getEnv("BACKEND_URL", ""),
 	}
 }
 
