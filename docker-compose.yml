@@ -25,17 +25,22 @@ services:
       - "7171:7171"
     environment:
       PORT: 7171
-      HEALTHCHECK: /management-information/health-check
+      HEALTHCHECK: /health-check
       SIRIUS_PUBLIC_URL: http://localhost:8080
       SIRIUS_URL: http://json-server:3000
       AWS_REGION: eu-west-1
       AWS_BASE_URL: http://localstack:4566
+      AWS_ACCESS_KEY_ID: localstack
+      AWS_SECRET_ACCESS_KEY: localstack
       S3_ENCRYPTION_KEY: alias/aws/s3
       AWS_S3_ENDPOINT: http://localstack:4566
       ASYNC_BUCKET: opg-backoffice-async-uploads-local
+      AWS_IAM_ROLE: role-arn
     depends_on:
       json-server:
         condition: service_started
+      localstack:
+        condition: service_healthy
 
   json-server:
     build:

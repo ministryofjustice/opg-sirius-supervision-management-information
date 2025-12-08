@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -37,11 +38,13 @@ func run(ctx context.Context, logger *slog.Logger) error {
 	envs := &service.Envs{
 		Port:            os.Getenv("PORT"),
 		AwsRegion:       os.Getenv("AWS_REGION"),
-		IamRole:         os.Getenv("IAM_ROLE"),
+		IamRole:         os.Getenv("AWS_IAM_ROLE"),
 		S3Endpoint:      os.Getenv("S3_ENDPOINT"),
 		S3EncryptionKey: os.Getenv("S3_ENCRYPTION_KEY"),
 		AsyncBucket:     os.Getenv("ASYNC_BUCKET"),
 	}
+
+    fmt.Println(envs)
 
 	fileStorageClient, err := filestorage.NewClient(
 		ctx,
