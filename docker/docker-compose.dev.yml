@@ -12,6 +12,7 @@ services:
       - ./management-information/main.go:/app/management-information/main.go
       - ./management-information/web/static:/app/management-information/web/static
       - ./management-information/web/template:/app/management-information/web/template
+      - ./shared:/app/shared
 
   management-information-api:
     build:
@@ -25,6 +26,7 @@ services:
       - ./management-information-api/internal:/app/management-information-api/internal
       - ./go.mod:/app/go.mod
       - ./go.sum:/app/go.sum
+      - ./shared:/app/shared
 
   yarn:
     command: watch

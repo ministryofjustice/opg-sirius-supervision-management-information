@@ -1,9 +1,10 @@
 package server
 
 import (
-	"bytes"
+	"encoding/base64"
 	"fmt"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
 )
@@ -46,7 +47,7 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 	}
 
 	switch uploadType {
-	case model.UploadTypeBonds:
+	case model.UploadTypeBonds: // Update to use shared.UploadType
 		bondProvider := r.PostFormValue("bondProvider")
 		if bondProvider == "" {
 			data.ValidationErrors = model.ValidationErrors{
@@ -63,24 +64,28 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		}
 
 		defer func() {
-            if err := file.Close(); err != nil {
-                fmt.Println("Error closing file:", err)
-            }
-        }()
+			if err := file.Close(); err != nil {
+				fmt.Println("Error closing file:", err)
+			}
+		}()
 
 		fileData, err := io.ReadAll(file)
 
 		if err != nil {
-            return err
-        }
+			return err
+		}
 
-		fmt.Println("Validation ok!")
-		fileBytes := bytes.NewReader(fileData)
-		err = h.router.Client().Upload(ctx, handler.Filename, fileBytes)
+		data := shared.Upload{
+			UploadType: shared.UploadTypeBonds,
+			Base64Data: base64.StdEncoding.EncodeToString(fileData),
+			Filename:   handler.Filename,
+		}
+
+		err = h.router.Client().Upload(ctx, data)
 
 		if err != nil {
-            return err
-        }
+			return err
+		}
 	}
 	return h.execute(w, r, data)
 }

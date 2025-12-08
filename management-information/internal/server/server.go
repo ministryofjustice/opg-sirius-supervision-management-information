@@ -5,6 +5,7 @@ import (
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
 	"io"
@@ -15,7 +16,7 @@ import (
 type ApiClient interface {
 	GetCurrentUserDetails(api.Context) (model.User, error)
 	GetBondProviders(api.Context) ([]model.BondProvider, error)
-	Upload(api.Context, string, io.Reader) error
+	Upload(api.Context, shared.Upload) error
 }
 
 type router interface {

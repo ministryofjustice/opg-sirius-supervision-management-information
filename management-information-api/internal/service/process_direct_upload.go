@@ -1,17 +1,24 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 )
 
-func (s *Service) ProcessDirectUpload(ctx context.Context, filename string, fileBytes io.Reader) error {
-	directory := "bonds-without-orders"
+func (s *Service) ProcessDirectUpload(ctx context.Context, uploadType shared.UploadType, fileName string, fileBytes bytes.Reader) error {
+	var directory string
 
-	filePath := fmt.Sprintf("%s/%s", directory, filename)
+	switch uploadType {
+	case shared.UploadTypeBonds:
+		directory = "bonds-with-orders"
+	}
 
-	_, err := s.fileStorage.StreamFile(ctx, s.envs.AsyncBucket, filePath, io.NopCloser(fileBytes))
+	filePath := fmt.Sprintf("%s/%s", directory, fileName)
+
+	_, err := s.fileStorage.StreamFile(ctx, s.envs.AsyncBucket, filePath, io.NopCloser(&fileBytes))
 	if err != nil {
 		return err
 	}

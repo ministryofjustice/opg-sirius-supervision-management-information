@@ -1,16 +1,22 @@
 package api
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"io"
+	"github.com/opg-sirius-supervision-management-information/shared"
+	"net/http"
 )
 
-func (c *ApiClient) Upload(ctx Context, filename string, fileBytes io.Reader) error {
-	// get directory based on upload type?
+func (c *ApiClient) Upload(ctx Context, data shared.Upload) error {
+	var body bytes.Buffer
 
-	// Hit api endpoint
+	err := json.NewEncoder(&body).Encode(data)
+	if err != nil {
+		return err
+	}
 
-	req, err := c.newBackendRequest(ctx, "POST", "/uploads", fileBytes)
+	req, err := c.newBackendRequest(ctx, http.MethodPost, "/uploads", &body)
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
 )
@@ -62,7 +63,6 @@ func (m mockApiClient) GetBondProviders(context api.Context) ([]model.BondProvid
 	return m.BondProviders, m.Error
 }
 
-func (m mockApiClient) Upload(context api.Context, fileName string, fileBytes io.Reader) (error) {
+func (m mockApiClient) Upload(context api.Context, data shared.Upload) error {
 	return m.Error
 }
-
