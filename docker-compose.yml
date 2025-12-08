@@ -35,7 +35,6 @@ services:
       S3_ENCRYPTION_KEY: alias/aws/s3
       AWS_S3_ENDPOINT: http://localstack:4566
       ASYNC_BUCKET: opg-backoffice-async-uploads-local
-      AWS_IAM_ROLE: role-arn
     depends_on:
       json-server:
         condition: service_started
