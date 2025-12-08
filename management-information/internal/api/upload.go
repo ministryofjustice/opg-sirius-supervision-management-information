@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"net/http"
 )
@@ -26,11 +25,18 @@ func (c *ApiClient) Upload(ctx Context, data shared.Upload) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	_, err = c.http.Do(req)
+	resp, err := c.http.Do(req)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("It worked!")
-	return nil
+	defer unchecked(resp.Body.Close)
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return nil
+	default:
+		c.logResponse(req, resp, err)
+		return newStatusError(resp)
+	}
 }

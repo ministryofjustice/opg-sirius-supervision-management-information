@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"net/http"
 )
@@ -14,18 +13,22 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) {
 	defer unchecked(r.Body.Close)
 
 	if err := json.NewDecoder(r.Body).Decode(&upload); err != nil {
-		// Throw an error
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	fileBytes, err := base64.StdEncoding.DecodeString(upload.Base64Data)
 	if err != nil {
-		// throw an error
+		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 
 	err = s.service.ProcessDirectUpload(r.Context(), upload.UploadType, upload.Filename, *bytes.NewReader(fileBytes))
 	if err != nil {
-		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }

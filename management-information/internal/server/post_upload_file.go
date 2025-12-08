@@ -58,6 +58,7 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		}
 
 		file, handler, err := r.FormFile("fileUpload")
+
 		if err != nil {
 
 			return err
@@ -82,10 +83,11 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		}
 
 		err = h.router.Client().Upload(ctx, data)
-
 		if err != nil {
 			return err
 		}
+
+		w.Header().Add("HX-Redirect", fmt.Sprintf("%s/uploads?success=upload", v.EnvironmentVars.Prefix))
 	}
 	return h.execute(w, r, data)
 }

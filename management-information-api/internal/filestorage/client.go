@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"io"
-	"fmt"
 )
 
 type S3Client interface {
@@ -38,10 +37,8 @@ func NewClient(ctx context.Context, region string, iamRole string, endpoint stri
 	}
 
 	if iamRole != "" {
-	    fmt.Println("Assuming role:", iamRole)
 		client := sts.NewFromConfig(cfg)
 		cfg.Credentials = stscreds.NewAssumeRoleProvider(client, iamRole)
-		fmt.Println("Credentials", cfg.Credentials)
 	}
 
 	s3Client := s3.NewFromConfig(cfg, func(u *s3.Options) {
