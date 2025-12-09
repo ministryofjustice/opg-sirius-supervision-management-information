@@ -17,16 +17,27 @@ type Service interface {
 }
 
 type FileStorage interface {
-	GetFile(ctx context.Context, bucketName string, filename string) (io.ReadCloser, error)
+	StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error)
 }
 
 type Server struct {
-	service Service
+	fileStorage FileStorage
+	asyncBucket string
 }
 
-func NewServer(service Service) *Server {
+type Envs struct {
+	Port            string
+	AwsRegion       string
+	IamRole         string
+	S3Endpoint      string
+	S3EncryptionKey string
+	AsyncBucket     string
+}
+
+func NewServer(fileStorage FileStorage, asyncBucket string) *Server {
 	return &Server{
-		service: service,
+		fileStorage: fileStorage,
+		asyncBucket: asyncBucket,
 	}
 }
 

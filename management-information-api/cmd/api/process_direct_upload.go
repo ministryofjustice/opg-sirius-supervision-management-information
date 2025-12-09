@@ -2,9 +2,11 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"github.com/opg-sirius-supervision-management-information/shared"
+	"io"
 	"net/http"
 )
 
@@ -23,7 +25,10 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.service.ProcessDirectUpload(r.Context(), upload.UploadType, upload.Filename, *bytes.NewReader(fileBytes))
+	directory := "bonds-without-orders"
+	ctx := context.Background()
+	_, err = s.fileStorage.StreamFile(ctx, s.asyncBucket, directory+"/"+upload.Filename, io.NopCloser(bytes.NewReader(fileBytes)))
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

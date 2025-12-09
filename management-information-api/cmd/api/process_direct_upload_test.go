@@ -17,7 +17,7 @@ func Test_processUpload(t *testing.T) {
 	tests := []struct {
 		name               string
 		upload             any
-		serverError        error
+		fileStorageError   error
 		expectedStatusCode int
 	}{
 		{
@@ -35,13 +35,13 @@ func Test_processUpload(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 		},
 		{
-			name: "server error",
+			name: "file storage error",
 			upload: shared.Upload{
 				UploadType: shared.UploadTypeUnknown,
 				Base64Data: base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
 				Filename:   "test.csv",
 			},
-			serverError:        fmt.Errorf("Oops!"),
+			fileStorageError:   fmt.Errorf("Oops!"),
 			expectedStatusCode: http.StatusInternalServerError,
 		},
 		{
@@ -55,9 +55,11 @@ func Test_processUpload(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		service := &mockService{err: tt.serverError}
+		mockS3 := &mockFileStorage{
+			err: tt.fileStorageError,
+		}
 
-		server := NewServer(service)
+		server := NewServer(mockS3, "async-bucket")
 
 		var body bytes.Buffer
 

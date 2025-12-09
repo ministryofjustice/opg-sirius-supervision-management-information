@@ -1,17 +1,18 @@
 package api
 
 import (
-	"bytes"
 	"context"
-	"github.com/opg-sirius-supervision-management-information/shared"
+	"io"
 )
 
-type mockService struct {
-	err              error
-	lastCalledParams []interface{}
+type mockFileStorage struct {
+	versionId  string
+	bucketname string
+	filename   string
+	data       io.Reader
+	err        error
 }
 
-func (s *mockService) ProcessDirectUpload(ctx context.Context, uploadType shared.UploadType, fileName string, fileBytes bytes.Reader) error {
-	s.lastCalledParams = []interface{}{ctx, uploadType, fileName, fileBytes}
-	return s.err
+func (m *mockFileStorage) StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error) {
+	return &m.versionId, m.err
 }

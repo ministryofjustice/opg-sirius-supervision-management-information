@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -13,7 +12,6 @@ import (
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information-api/cmd/api"
 	"github.com/opg-sirius-supervision-management-information/management-information-api/internal/filestorage"
-	"github.com/opg-sirius-supervision-management-information/management-information-api/internal/service"
 )
 
 func main() {
@@ -35,7 +33,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	envs := &service.Envs{
+	envs := &api.Envs{
 		Port:            os.Getenv("PORT"),
 		AwsRegion:       os.Getenv("AWS_REGION"),
 		IamRole:         os.Getenv("AWS_IAM_ROLE"),
@@ -43,8 +41,6 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		S3EncryptionKey: os.Getenv("S3_ENCRYPTION_KEY"),
 		AsyncBucket:     os.Getenv("ASYNC_BUCKET"),
 	}
-
-	fmt.Println(envs)
 
 	fileStorageClient, err := filestorage.NewClient(
 		ctx,
@@ -58,15 +54,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	// creates a new service
-	Service := service.NewService(fileStorageClient, envs)
-
-	//validator, err := validation.New()
-	//if err != nil {
-	//	return err
-	//}
-
-	server := api.NewServer(Service)
+	server := api.NewServer(fileStorageClient, envs.AsyncBucket)
 
 	s := &http.Server{
 		Addr:              ":" + envs.Port,
