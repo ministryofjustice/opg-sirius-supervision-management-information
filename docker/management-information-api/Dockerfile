@@ -42,6 +42,7 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 COPY management-information-api management-information-api
+COPY shared shared
 
 RUN go mod download
 

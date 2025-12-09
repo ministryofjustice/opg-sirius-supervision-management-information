@@ -2,11 +2,12 @@ package server
 
 import (
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"net/http"
 )
 
 type UploadsVars struct {
-	UploadTypes   []model.UploadType
+	UploadTypes   []shared.UploadType
 	BondProviders []model.BondProvider
 	AppVars
 }
@@ -22,7 +23,7 @@ func (h *GetUploadsHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		return err
 	}
 	data := UploadsVars{
-		model.UploadTypes,
+		shared.UploadTypes,
 		bondProviders,
 		v}
 	data.selectTab("uploads")

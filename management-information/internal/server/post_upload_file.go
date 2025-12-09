@@ -10,7 +10,7 @@ import (
 )
 
 type UploadFileVars struct {
-	UploadTypes      []model.UploadType
+	UploadTypes      []shared.UploadType
 	BondProviders    []model.BondProvider
 	ValidationErrors model.ValidationErrors
 	AppVars
@@ -30,13 +30,13 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		return err
 	}
 	data := UploadFileVars{
-		model.UploadTypes,
+		shared.UploadTypes,
 		bondProviders,
 		nil,
 		v}
 	data.selectTab("uploads")
 
-	uploadType := model.ParseUploadType(r.PostFormValue("uploadType"))
+	uploadType := shared.ParseUploadType(r.PostFormValue("uploadType"))
 
 	if !uploadType.Valid() {
 		data.ValidationErrors = model.ValidationErrors{
@@ -47,7 +47,7 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 	}
 
 	switch uploadType {
-	case model.UploadTypeBonds: // Update to use shared.UploadType
+	case shared.UploadTypeBonds:
 		bondProvider := r.PostFormValue("bondProvider")
 		if bondProvider == "" {
 			data.ValidationErrors = model.ValidationErrors{

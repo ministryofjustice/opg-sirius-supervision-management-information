@@ -10,10 +10,6 @@ type EnvironmentVars struct {
 	SiriusURL       string
 	SiriusPublicURL string
 	Prefix          string
-	AwsRegion       string
-	IamRole         string
-	S3Endpoint      string
-	S3EncryptionKey string
 	BackendURL      string
 }
 

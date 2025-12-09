@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -41,7 +42,7 @@ func TestGetUploads(t *testing.T) {
 	assert.True(t, ro.executed)
 
 	expected := UploadsVars{
-		model.UploadTypes,
+		shared.UploadTypes,
 		[]model.BondProvider{
 			{Id: 1, Name: "Provider A"},
 			{Id: 2, Name: "Provider B"},

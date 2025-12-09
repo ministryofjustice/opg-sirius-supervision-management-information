@@ -107,8 +107,6 @@ func (c *ApiClient) newBackendRequest(ctx Context, method, path string, body io.
 		return nil, err
 	}
 
-	//req.Header.Add("Authorization", "Bearer " . c.jwt.)
-
 	return req, err
 }
 

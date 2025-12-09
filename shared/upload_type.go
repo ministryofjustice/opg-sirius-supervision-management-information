@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 )
 
+var UploadTypes = []UploadType{
+	UploadTypeBonds,
+}
+
 type UploadType int
 
 const (
@@ -12,17 +16,26 @@ const (
 )
 
 var uploadTypeMap = map[string]UploadType{
-	"BONDS": UploadTypeBonds,
+	"Bonds": UploadTypeBonds,
 }
 
 func (u UploadType) String() string {
 	return u.Key()
 }
 
+func (u UploadType) Directory() string {
+	switch u {
+	case UploadTypeBonds:
+		return "bonds-without-orders"
+	default:
+		return ""
+	}
+}
+
 func (u UploadType) Translation() string {
 	switch u {
 	case UploadTypeBonds:
-		return "Bonds without orders upload"
+		return "Bonds"
 	default:
 		return ""
 	}
@@ -31,7 +44,7 @@ func (u UploadType) Translation() string {
 func (u UploadType) Key() string {
 	switch u {
 	case UploadTypeBonds:
-		return "BONDS"
+		return "Bonds"
 	default:
 		return ""
 	}
