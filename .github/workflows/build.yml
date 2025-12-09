@@ -170,16 +170,22 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: sirius/sirius-management-information
+          API_ECR_REPOSITORY: sirius/sirius-management-information-api
         run: |
           docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.create-tag.outputs.tag }}
+          docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information-api:latest $ECR_REGISTRY/$API_ECR_REPOSITORY:${{ needs.create-tag.outputs.tag }}
           if ${{ github.ref_name == 'main' }}
           then
             docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest $ECR_REGISTRY/$ECR_REPOSITORY:main-${{ needs.create-tag.outputs.tag }}
+            docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information-api:latest $ECR_REGISTRY/$API_ECR_REPOSITORY:main-${{ needs.create-tag.outputs.tag }}
             docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest $ECR_REGISTRY/$ECR_REPOSITORY:main-${{ needs.create-tag.outputs.tag }}-${{ needs.create-tag.outputs.timestamp }}
+            docker tag 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information-api:latest $ECR_REGISTRY/$API_ECR_REPOSITORY:main-${{ needs.create-tag.outputs.tag }}-${{ needs.create-tag.outputs.timestamp }}
             # We want all of the tags pushed
             docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
+            docker push --all-tags $ECR_REGISTRY/$API_ECR_REPOSITORY
           else
             docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ needs.create-tag.outputs.tag }}
+            docker push $ECR_REGISTRY/$API_ECR_REPOSITORY:${{ needs.create-tag.outputs.tag }}
           fi
 
   end_of_pr_workflow:
