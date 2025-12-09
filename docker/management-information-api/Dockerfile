@@ -50,7 +50,7 @@ WORKDIR /app/management-information-api
 
 RUN go build -a -installsuffix cgo -o /go/bin/management-information-api
 
-FROM scratch
+FROM scratch AS prod
 
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=base /etc/passwd /etc/passwd

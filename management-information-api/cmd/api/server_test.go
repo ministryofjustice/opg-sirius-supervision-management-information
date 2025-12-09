@@ -6,11 +6,8 @@ import (
 )
 
 type mockFileStorage struct {
-	versionId  string
-	bucketname string
-	filename   string
-	data       io.Reader
-	err        error
+	versionId string
+	err       error
 }
 
 func (m *mockFileStorage) StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error) {
