@@ -161,7 +161,7 @@ jobs:
           merge-multiple: true
       - name: Load Images
         run: |
-          docker load -i /tmp/images/multi-arch-image.tar
+          docker load -i /tmp/images/${{ matrix.service_name }}-multi-arch.tar
 
       - name: Configure OIDC AWS credentials for ECR push
         uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
