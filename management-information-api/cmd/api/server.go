@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/shared"
@@ -47,7 +46,7 @@ func (s *Server) SetupRoutes(logger *slog.Logger) http.Handler {
 
 	mux.HandleFunc("POST /uploads", s.ProcessDirectUpload)
 
-	mux.Handle("/health-check", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { fmt.Println("Api healthy!") }))
+	mux.Handle("/health-check", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 
 	return otelhttp.NewHandler(telemetry.Middleware(logger)(securityheaders.Use(mux)), "supervision-finance-api")
 }
