@@ -19,6 +19,7 @@ func Test_processUpload(t *testing.T) {
 		upload             any
 		fileStorageError   error
 		expectedStatusCode int
+		expectedFileName   string
 	}{
 		{
 			name: "base64 decode error",
@@ -47,11 +48,13 @@ func Test_processUpload(t *testing.T) {
 		{
 			name: "pass",
 			upload: shared.Upload{
-				UploadType: shared.UploadTypeBonds,
-				Filename:   "data.csv",
-				Base64Data: base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
+				UploadType:   shared.UploadTypeBonds,
+				Filename:     "data.csv",
+				Base64Data:   base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
+				BondProvider: shared.BondProvider{Name: "Marsh"},
 			},
 			expectedStatusCode: http.StatusOK,
+			expectedFileName:   "bonds-without-orders/Marsh_11_12_2025.csv",
 		},
 	}
 	for _, tt := range tests {
@@ -71,5 +74,8 @@ func Test_processUpload(t *testing.T) {
 
 		server.ProcessDirectUpload(w, r)
 		assert.Equal(t, tt.expectedStatusCode, w.Result().StatusCode)
+		if tt.expectedFileName != "" {
+			assert.Equal(t, tt.expectedFileName, mockS3.fileName)
+		}
 	}
 }

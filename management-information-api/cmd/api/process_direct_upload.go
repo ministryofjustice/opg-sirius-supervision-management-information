@@ -27,7 +27,7 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fileName := fmt.Sprintf("%s_%s", upload.BondProvider.Name, time.Now().Format("02_01_2006"))
+	fileName := fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006"))
 	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), fileName)
 
 	_, err = s.fileStorage.StreamFile(context.Background(), s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
