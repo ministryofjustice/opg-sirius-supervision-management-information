@@ -9,6 +9,7 @@ import (
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
+	"time"
 )
 
 func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) {
@@ -26,9 +27,10 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), upload.Filename)
-	ctx := context.Background()
-	_, err = s.fileStorage.StreamFile(ctx, s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
+	fileName := fmt.Sprintf("%s_%s", upload.BondProvider.Name, time.Now().Format("02_01_2006"))
+	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), fileName)
+
+	_, err = s.fileStorage.StreamFile(context.Background(), s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

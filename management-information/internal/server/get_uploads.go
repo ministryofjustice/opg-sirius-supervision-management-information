@@ -8,7 +8,7 @@ import (
 
 type UploadsVars struct {
 	UploadTypes   []shared.UploadType
-	BondProviders []model.BondProvider
+	BondProviders []shared.BondProvider
 	AppVars
 }
 

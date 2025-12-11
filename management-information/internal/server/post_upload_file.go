@@ -11,7 +11,7 @@ import (
 
 type UploadFileVars struct {
 	UploadTypes      []shared.UploadType
-	BondProviders    []model.BondProvider
+	BondProviders    []shared.BondProvider
 	ValidationErrors model.ValidationErrors
 	AppVars
 }

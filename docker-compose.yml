@@ -16,6 +16,8 @@ services:
     depends_on:
       json-server:
         condition: service_started
+      management-information-api:
+        condition: service_healthy
 
   management-information-api:
     build:

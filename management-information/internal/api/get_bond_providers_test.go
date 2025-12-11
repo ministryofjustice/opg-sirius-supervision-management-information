@@ -37,7 +37,7 @@ func TestGetBondProviders(t *testing.T) {
 		}, nil
 	}
 
-	expectedResponse := []model.BondProvider{
+	expectedResponse := []shared.BondProvider{
 		{Id: 1, Name: "Marsh"},
 		{Id: 2, Name: "Howden"},
 		{Id: 3, Name: "DBS"},

@@ -11,7 +11,7 @@ import (
 
 func TestGetUploads(t *testing.T) {
 	client := mockApiClient{
-		BondProviders: []model.BondProvider{
+		BondProviders: []shared.BondProvider{
 			{Id: 1, Name: "Provider A"},
 			{Id: 2, Name: "Provider B"},
 		},
@@ -43,7 +43,7 @@ func TestGetUploads(t *testing.T) {
 
 	expected := UploadsVars{
 		shared.UploadTypes,
-		[]model.BondProvider{
+		[]shared.BondProvider{
 			{Id: 1, Name: "Provider A"},
 			{Id: 2, Name: "Provider B"},
 		},

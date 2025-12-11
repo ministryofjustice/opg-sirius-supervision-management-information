@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func (c *ApiClient) GetBondProviders(ctx Context) ([]model.BondProvider, error) {
-	var v []model.BondProvider
+func (c *ApiClient) GetBondProviders(ctx Context) ([]shared.BondProvider, error) {
+	var v []shared.BondProvider
 
 	req, err := c.newRequest(ctx, http.MethodGet, "/v1/bond-providers", nil)
 	if err != nil {

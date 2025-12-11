@@ -15,7 +15,7 @@ import (
 
 type ApiClient interface {
 	GetCurrentUserDetails(api.Context) (model.User, error)
-	GetBondProviders(api.Context) ([]model.BondProvider, error)
+	GetBondProviders(api.Context) ([]shared.BondProvider, error)
 	Upload(api.Context, shared.Upload) error
 }
 

@@ -52,14 +52,14 @@ func (m *mockTemplate) ExecuteTemplate(w io.Writer, name string, vars any) error
 type mockApiClient struct {
 	Error         error
 	User          model.User
-	BondProviders []model.BondProvider
+	BondProviders []shared.BondProvider
 }
 
 func (m mockApiClient) GetCurrentUserDetails(context api.Context) (model.User, error) {
 	return m.User, m.Error
 }
 
-func (m mockApiClient) GetBondProviders(context api.Context) ([]model.BondProvider, error) {
+func (m mockApiClient) GetBondProviders(context api.Context) ([]shared.BondProvider, error) {
 	return m.BondProviders, m.Error
 }
 
