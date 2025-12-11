@@ -77,9 +77,10 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		}
 
 		data := shared.Upload{
-			UploadType: shared.UploadTypeBonds,
-			Base64Data: base64.StdEncoding.EncodeToString(fileData),
-			Filename:   handler.Filename,
+			UploadType:   shared.UploadTypeBonds,
+			Base64Data:   base64.StdEncoding.EncodeToString(fileData),
+			Filename:     handler.Filename,
+			BondProvider: shared.BondProvider{Name: bondProvider},
 		}
 
 		err = h.router.Client().Upload(ctx, data)
