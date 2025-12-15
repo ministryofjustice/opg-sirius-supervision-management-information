@@ -21,4 +21,15 @@ describe("Upload page", () => {
             cy.get('#f-BondProvider').should('have.class', 'govuk-form-group--error');
         });
     });
+
+    describe("Uploading a file", () => {
+        it("displays success message on successful upload", () => {
+            cy.get('#upload-type').select('Bonds');
+            cy.get('#bond-provider').select('Marsh');
+            cy.get('input[type="file"]').selectFile('cypress/fixtures/bonds-without-orders.csv');
+            cy.contains('.govuk-button', 'Upload file').click();
+            cy.url().should('include', '/uploads?success=upload');
+            cy.get('.moj-banner').contains('File successfully uploaded');
+        });
+    });
 });
