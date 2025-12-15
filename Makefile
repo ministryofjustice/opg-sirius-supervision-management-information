@@ -33,8 +33,11 @@ clean:
 	docker compose down
 	docker compose run --rm yarn
 
-up: clean build-dev
+dev-up: clean build-dev
 	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information management-information-api localstack yarn
+
+up: clean build-all
+	docker compose -f docker-compose.yml up -d --wait management-information
 
 down:
 	docker compose down

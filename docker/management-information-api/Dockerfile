@@ -61,6 +61,6 @@ COPY --from=healthcheck-build /go/bin/healthcheck healthcheck
 
 USER app-user:app-user
 
-HEALTHCHECK --interval=5s --timeout=5s --start-period=5s --retries=5 CMD [ "/healthcheck" ]
+HEALTHCHECK --interval=5s --timeout=10s --start-period=5s --retries=5 CMD [ "/healthcheck" ]
 
 ENTRYPOINT ["./management-information-api"]
