@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -54,7 +55,7 @@ func Test_processUpload(t *testing.T) {
 				BondProvider: shared.BondProvider{Name: "Marsh"},
 			},
 			expectedStatusCode: http.StatusOK,
-			expectedFileName:   "bonds-without-orders/Marsh_11_12_2025.csv",
+			expectedFileName:   "bonds-without-orders/Marsh_15_12_2025.csv", //Todo - fix so it isn't impacted by current date
 		},
 	}
 	for _, tt := range tests {
@@ -67,9 +68,8 @@ func Test_processUpload(t *testing.T) {
 		var body bytes.Buffer
 
 		_ = json.NewEncoder(&body).Encode(tt.upload)
-		r := httptest.NewRequest(http.MethodPost, "/upload", &body)
-		ctx := context.Background()
-		r = r.WithContext(ctx)
+		ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-management-information"))
+		r, _ := http.NewRequestWithContext(ctx, http.MethodPost, "/upload", &body)
 		w := httptest.NewRecorder()
 
 		server.ProcessDirectUpload(w, r)
