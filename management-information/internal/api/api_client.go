@@ -66,7 +66,7 @@ func NewApiClient(httpClient HTTPClient, baseURL string, logger *slog.Logger, ba
 		http:       httpClient,
 		baseURL:    baseURL,
 		logger:     logger,
-		BackendURL: backendURL,
+		backendURL: backendURL,
 	}, nil
 }
 
@@ -82,7 +82,7 @@ type ApiClient struct {
 	http       HTTPClient
 	baseURL    string
 	logger     *slog.Logger
-	BackendURL string
+	backendURL string
 }
 
 func (c *ApiClient) newRequest(ctx Context, method, path string, body io.Reader) (*http.Request, error) {
@@ -102,7 +102,7 @@ func (c *ApiClient) newRequest(ctx Context, method, path string, body io.Reader)
 }
 
 func (c *ApiClient) newBackendRequest(ctx Context, method, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx.Context, method, c.BackendURL+path, body)
+	req, err := http.NewRequestWithContext(ctx.Context, method, c.backendURL+path, body)
 	if err != nil {
 		return nil, err
 	}
