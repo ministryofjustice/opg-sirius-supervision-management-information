@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
 	"mime/multipart"
 	"net/http"
@@ -22,7 +23,9 @@ func TestUploadFileHandlerSuccess(t *testing.T) {
 	_, _ = fileWriter.Write([]byte("col1,col2\nval1,val2\n"))
 	_ = writer.Close()
 
-	client := mockApiClient{}
+	bondProviders := shared.BondProviders{{Id: 1, Name: "Provider1"}}
+
+	client := mockApiClient{BondProviders: bondProviders}
 	ro := &mockRoute{client: client}
 
 	w := httptest.NewRecorder()
@@ -44,10 +47,12 @@ func TestUploadFileHandlerSuccess(t *testing.T) {
 func TestUploadFileHandlerValidationErrors(t *testing.T) {
 	form := url.Values{
 		"uploadType":   {""},
-		"bondProvider": {""},
+		"bondProvider": {"1"},
 	}
 
-	client := mockApiClient{}
+	bondProviders := shared.BondProviders{{Id: 1, Name: "Provider1"}}
+
+	client := mockApiClient{BondProviders: bondProviders}
 	ro := &mockRoute{client: client}
 
 	w := httptest.NewRecorder()

@@ -7,6 +7,7 @@ import (
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 type UploadFileVars struct {
@@ -48,13 +49,23 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 
 	switch uploadType {
 	case shared.UploadTypeBonds:
-		bondProvider := r.PostFormValue("bondProvider")
-		if bondProvider == "" {
+		bondProviderId, err := strconv.Atoi(r.PostFormValue("bondProvider"))
+		if err != nil || bondProviderId == 0 {
 			data.ValidationErrors = model.ValidationErrors{
 				"BondProvider": map[string]string{"required": "Please select a bond provider"},
 			}
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return h.execute(w, r, data)
+		}
+
+		bondProvider := bondProviders.GetById(bondProviderId)
+		if bondProvider == nil {
+			data.ValidationErrors = model.ValidationErrors{
+				"BondProvider": map[string]string{"required": "Bond provider not recognised"},
+			}
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			return h.execute(w, r, data)
+
 		}
 
 		file, handler, err := r.FormFile("fileUpload")
@@ -80,7 +91,7 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 			UploadType:   shared.UploadTypeBonds,
 			Base64Data:   base64.StdEncoding.EncodeToString(fileData),
 			Filename:     handler.Filename,
-			BondProvider: shared.BondProvider{Name: bondProvider},
+			BondProvider: *bondProvider,
 		}
 
 		err = h.router.Client().Upload(ctx, data)

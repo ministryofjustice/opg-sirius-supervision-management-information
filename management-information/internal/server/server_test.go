@@ -59,7 +59,7 @@ func (m mockApiClient) GetCurrentUserDetails(context api.Context) (model.User, e
 	return m.User, m.Error
 }
 
-func (m mockApiClient) GetBondProviders(context api.Context) ([]shared.BondProvider, error) {
+func (m mockApiClient) GetBondProviders(context api.Context) (shared.BondProviders, error) {
 	return m.BondProviders, m.Error
 }
 
