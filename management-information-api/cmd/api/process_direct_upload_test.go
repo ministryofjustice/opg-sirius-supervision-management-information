@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 func Test_processUpload(t *testing.T) {
@@ -20,7 +21,6 @@ func Test_processUpload(t *testing.T) {
 		upload             any
 		fileStorageError   error
 		expectedStatusCode int
-		expectedFileName   string
 	}{
 		{
 			name: "base64 decode error",
@@ -55,7 +55,6 @@ func Test_processUpload(t *testing.T) {
 				BondProvider: shared.BondProvider{Name: "Marsh"},
 			},
 			expectedStatusCode: http.StatusOK,
-			//expectedFileName:   "bonds-without-orders/Marsh_15_12_2025.csv", //Todo - fix so it isn't impacted by current date
 		},
 	}
 	for _, tt := range tests {
@@ -67,6 +66,12 @@ func Test_processUpload(t *testing.T) {
 
 		var body bytes.Buffer
 
+		var expectedFileName string
+		if tt.expectedStatusCode == http.StatusOK {
+			expectedDate := time.Now().Format("02_01_2006")
+			expectedFileName = fmt.Sprintf("bonds-without-orders/Marsh_%s.csv", expectedDate)
+		}
+
 		_ = json.NewEncoder(&body).Encode(tt.upload)
 		ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-management-information"))
 		r, _ := http.NewRequestWithContext(ctx, http.MethodPost, "/upload", &body)
@@ -74,8 +79,8 @@ func Test_processUpload(t *testing.T) {
 
 		server.ProcessDirectUpload(w, r)
 		assert.Equal(t, tt.expectedStatusCode, w.Result().StatusCode)
-		if tt.expectedFileName != "" {
-			assert.Equal(t, tt.expectedFileName, mockS3.fileName)
+		if expectedFileName != "" {
+			assert.Equal(t, expectedFileName, mockS3.fileName)
 		}
 	}
 }
