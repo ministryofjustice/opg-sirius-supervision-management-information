@@ -34,8 +34,19 @@ const show = (suffix) => (idName) => {
 }
 
 // adding event listeners inside the onLoad function will ensure they are re-added to partial content when loaded back in
-htmx.onLoad(content => {
+htmx.onLoad(() => {
     initAll();
+
+    htmx.findAll(".moj-banner--success").forEach((element) => {
+        element.addEventListener("click", () => {
+            htmx.addClass(element, "hide");
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('success')) {
+                url.searchParams.delete('success');
+                window.history.replaceState({}, '', url.toString());
+            }
+        });
+    });
 
     if (document.getElementById('upload-type')) {
         const toggle = formToggler("field-input")
