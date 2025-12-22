@@ -42,4 +42,5 @@ This will host at:
 
 ## Run the Cypress tests in UI
 `make up` in one terminal (wait for the app to build)
+`cd cypress`
 `npx cypress open baseUrl=http://localhost:7777/downloads` in another terminal

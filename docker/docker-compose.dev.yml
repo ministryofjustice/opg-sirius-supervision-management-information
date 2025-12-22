@@ -5,14 +5,28 @@ services:
     ports:
       - '3456:3456'
     volumes:
-      - ./.air.toml:/app/.air.toml
+      - ./management-information/.air.toml:/app/management-information/.air.toml
       - ./go.mod:/app/go.mod
       - ./go.sum:/app/go.sum
-      - ./internal:/app/internal
-      - ./main_test.go:/app/main_test.go
-      - ./main.go:/app/main.go
-      - ./web/static:/app/web/static
-      - ./web/template:/app/web/template
+      - ./management-information/internal:/app/management-information/internal
+      - ./management-information/main.go:/app/management-information/main.go
+      - ./management-information/web/static:/app/management-information/web/static
+      - ./management-information/web/template:/app/management-information/web/template
+      - ./shared:/app/shared
+
+  management-information-api:
+    build:
+      target: dev
+    ports:
+      - '4567:3456'
+    volumes:
+      - ./management-information-api/.air.toml:/app/management-information-api/.air.toml
+      - ./management-information-api/main.go:/app/management-information-api/main.go
+      - ./management-information-api/cmd:/app/management-information-api/cmd
+      - ./management-information-api/internal:/app/management-information-api/internal
+      - ./go.mod:/app/go.mod
+      - ./go.sum:/app/go.sum
+      - ./shared:/app/shared
 
   yarn:
     command: watch
