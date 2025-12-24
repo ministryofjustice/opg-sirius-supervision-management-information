@@ -40,9 +40,7 @@
     "@babel/helper-validator-identifier" "^7.28.5"
 
 "@cypress/grep@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@cypress/grep/-/grep-5.0.0.tgz#10507842fd6244f443ab5c34dd80d48216e05d53"
-  integrity sha512-VVKGfZdIrKZef7Q/lDOE7nWoVyoctbNp34moMDtPhQFPbo9bcV2WAeaHZijMrE/Hyl9gvorFL/BXsvwMuTxqJw==
+  version "5.0.1"
   dependencies:
     debug "^4.3.4"
     find-test-names "^1.28.18"
@@ -431,9 +429,7 @@ cypress-failed-log@^2.10.0:
     logdown "3.3.1"
 
 cypress@^15.0.0:
-  version "15.5.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-15.5.0.tgz#039c8549f623957a14e57adee46dbfabaabac741"
-  integrity sha512-7jXBsh5hTfjxr9QQONC2IbdTj0nxSyU8x4eiarMZBzXzCj3pedKviUx8JnLcE4vL8e0TsOzp70WSLRORjEssRA==
+  version "15.8.1"
   dependencies:
     "@cypress/request" "^3.0.9"
     "@cypress/xvfb" "^1.2.4"
