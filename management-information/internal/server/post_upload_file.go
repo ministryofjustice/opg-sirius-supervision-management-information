@@ -22,7 +22,7 @@ type UploadFileHandler struct {
 }
 
 func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Request) error {
-	ctx := getContext(r)
+	ctx := r.Context()
 
 	bondProviders, err := h.router.Client().GetBondProviders(ctx)
 	if err != nil {

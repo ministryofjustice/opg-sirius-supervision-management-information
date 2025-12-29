@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"io"
 	"log/slog"
 	"net/http"
@@ -39,12 +40,6 @@ func (e StatusError) Data() interface{} {
 	return e
 }
 
-type Context struct {
-	context.Context
-	Cookies   []*http.Cookie
-	XSRFToken string
-}
-
 func newStatusError(resp *http.Response) StatusError {
 	return StatusError{
 		Code:   resp.StatusCode,
@@ -61,9 +56,10 @@ func (e ClientError) Error() string {
 	return string(e)
 }
 
-func NewApiClient(httpClient HTTPClient, baseURL string, logger *slog.Logger, backendURL string) (*ApiClient, error) {
+func NewApiClient(httpClient HTTPClient, jwt JWTClient, baseURL string, logger *slog.Logger, backendURL string) (*ApiClient, error) {
 	return &ApiClient{
 		http:       httpClient,
+		jwt:        jwt,
 		baseURL:    baseURL,
 		logger:     logger,
 		backendURL: backendURL,
@@ -78,34 +74,48 @@ type FileStorageInterface interface {
 	StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error)
 }
 
+type JWTClient interface {
+	CreateJWT(ctx context.Context) string
+}
+
 type ApiClient struct {
 	http       HTTPClient
 	baseURL    string
 	logger     *slog.Logger
 	backendURL string
+	jwt        JWTClient
 }
 
-func (c *ApiClient) newRequest(ctx Context, method, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx.Context, method, c.baseURL+path, body)
+func addXsrfFromContext(ctx context.Context, req *http.Request) {
+	req.Header.Add("X-XSRF-TOKEN", ctx.(auth.Context).XSRFToken)
+}
+
+func addCookiesFromContext(ctx context.Context, req *http.Request) {
+	for _, c := range ctx.(auth.Context).Cookies {
+		req.AddCookie(c)
+	}
+}
+
+func (c *ApiClient) newRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, body)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, c := range ctx.Cookies {
-		req.AddCookie(c)
-	}
-
+	addCookiesFromContext(ctx, req)
+	addXsrfFromContext(ctx, req)
 	req.Header.Add("OPG-Bypass-Membrane", "1")
-	req.Header.Add("X-XSRF-TOKEN", ctx.XSRFToken)
 
 	return req, err
 }
 
-func (c *ApiClient) newBackendRequest(ctx Context, method, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx.Context, method, c.backendURL+path, body)
+func (c *ApiClient) newBackendRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(ctx, method, c.backendURL+path, body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Authorization", "Bearer "+c.jwt.CreateJWT(ctx))
 
 	return req, err
 }

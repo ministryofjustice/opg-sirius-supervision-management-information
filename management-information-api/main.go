@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/opg-sirius-supervision-management-information/management-information-api/internal/auth"
 	"log/slog"
 	"net/http"
 	"os"
@@ -40,6 +41,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		S3Endpoint:      os.Getenv("AWS_S3_ENDPOINT"),
 		S3EncryptionKey: os.Getenv("S3_ENCRYPTION_KEY"),
 		AsyncBucket:     os.Getenv("ASYNC_BUCKET"),
+		JWTSecret:       os.Getenv("JWT_SECRET"),
 	}
 
 	fileStorageClient, err := filestorage.NewClient(
@@ -54,7 +56,9 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	server := api.NewServer(fileStorageClient, envs.AsyncBucket)
+	server := api.NewServer(fileStorageClient, envs.AsyncBucket, &auth.JWT{
+		Secret: envs.JWTSecret,
+	})
 
 	s := &http.Server{
 		Addr:              ":" + envs.Port,

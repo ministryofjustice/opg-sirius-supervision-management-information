@@ -1,13 +1,14 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"net/http"
 )
 
-func (c *ApiClient) GetCurrentUserDetails(ctx Context) (model.User, error) {
-	var v model.User
+func (c *ApiClient) GetCurrentUserDetails(ctx context.Context) (shared.User, error) {
+	var v shared.User
 
 	req, err := c.newRequest(ctx, http.MethodGet, "/v1/users/current", nil)
 	if err != nil {

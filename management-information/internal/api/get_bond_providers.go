@@ -1,12 +1,13 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"net/http"
 )
 
-func (c *ApiClient) GetBondProviders(ctx Context) (shared.BondProviders, error) {
+func (c *ApiClient) GetBondProviders(ctx context.Context) (shared.BondProviders, error) {
 	var v shared.BondProviders
 
 	req, err := c.newRequest(ctx, http.MethodGet, "/v1/bond-providers", nil)

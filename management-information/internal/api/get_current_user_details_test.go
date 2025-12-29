@@ -45,7 +45,7 @@ func TestGetCurrentUserDetails(t *testing.T) {
 		}, nil
 	}
 
-	expectedResponse := model.User{
+	expectedResponse := shared.User{
 		Id:          65,
 		PhoneNumber: "12345678",
 		Name:        "case manager",
@@ -126,7 +126,7 @@ func TestMyDetailsReturns200(t *testing.T) {
 		}, nil
 	}
 
-	expectedResponse := model.User{
+	expectedResponse := shared.User{
 		Id:          55,
 		PhoneNumber: "12345678",
 		Name:        "case manager",

@@ -2,12 +2,13 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"net/http"
 )
 
-func (c *ApiClient) Upload(ctx Context, data shared.Upload) error {
+func (c *ApiClient) Upload(ctx context.Context, data shared.Upload) error {
 	var body bytes.Buffer
 
 	err := json.NewEncoder(&body).Encode(data)
@@ -20,9 +21,6 @@ func (c *ApiClient) Upload(ctx Context, data shared.Upload) error {
 		return err
 	}
 
-	if err != nil {
-		return err
-	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := c.http.Do(req)

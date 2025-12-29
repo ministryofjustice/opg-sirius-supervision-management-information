@@ -18,7 +18,7 @@
                             hx-target="#error-summary"
                             enctype="multipart/form-data"
                     >
-                        <input type="hidden" name="xsrfToken" value="{{ .AppVars.XSRFToken }}"/>
+                        <input type="hidden" name="CSRF" value="{{ .AppVars.XSRFToken }}"/>
                         <div class="govuk-form-group">
                             <div class="govuk-form-group" id="f-UploadType">
                                 <label class="govuk-label" for="upload-type">

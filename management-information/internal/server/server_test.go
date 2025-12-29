@@ -1,8 +1,7 @@
 package server
 
 import (
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"context"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
@@ -51,18 +50,18 @@ func (m *mockTemplate) ExecuteTemplate(w io.Writer, name string, vars any) error
 
 type mockApiClient struct {
 	Error         error
-	User          model.User
+	User          shared.User
 	BondProviders []shared.BondProvider
 }
 
-func (m mockApiClient) GetCurrentUserDetails(context api.Context) (model.User, error) {
+func (m mockApiClient) GetCurrentUserDetails(context context.Context) (shared.User, error) {
 	return m.User, m.Error
 }
 
-func (m mockApiClient) GetBondProviders(context api.Context) (shared.BondProviders, error) {
+func (m mockApiClient) GetBondProviders(context context.Context) (shared.BondProviders, error) {
 	return m.BondProviders, m.Error
 }
 
-func (m mockApiClient) Upload(context api.Context, data shared.Upload) error {
+func (m mockApiClient) Upload(context context.Context, data shared.Upload) error {
 	return m.Error
 }

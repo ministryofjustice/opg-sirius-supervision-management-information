@@ -11,6 +11,7 @@ type EnvironmentVars struct {
 	SiriusPublicURL string
 	Prefix          string
 	BackendURL      string
+	JWTSecret       string
 }
 
 func NewEnvironmentVars() EnvironmentVars {
@@ -21,6 +22,7 @@ func NewEnvironmentVars() EnvironmentVars {
 		SiriusPublicURL: getEnv("SIRIUS_PUBLIC_URL", ""),
 		Prefix:          getEnv("PREFIX", ""),
 		BackendURL:      getEnv("BACKEND_URL", ""),
+		JWTSecret:       os.Getenv("JWT_SECRET"),
 	}
 }
 

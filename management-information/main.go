@@ -6,6 +6,7 @@ import (
 	"github.com/ministryofjustice/opg-go-common/paginate"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/server"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
@@ -38,7 +39,9 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	envVars := server.NewEnvironmentVars()
 
-	client, err := api.NewApiClient(http.DefaultClient, envVars.SiriusURL+supervisionAPIPath, logger, envVars.BackendURL)
+	client, err := api.NewApiClient(http.DefaultClient, &auth.JWT{
+		Secret: envVars.JWTSecret,
+	}, envVars.SiriusURL+supervisionAPIPath, logger, envVars.BackendURL)
 	if err != nil {
 		logger.Error("Error creating new Api Client", "error", err)
 	}

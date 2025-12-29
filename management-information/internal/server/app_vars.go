@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
 	"net/http"
 	"net/url"
 )
@@ -64,23 +63,5 @@ func (a *AppVars) selectTab(s string) {
 				Selected: true,
 			}
 		}
-	}
-}
-
-func getContext(r *http.Request) api.Context {
-	token := ""
-
-	if r.Method == http.MethodGet {
-		if cookie, err := r.Cookie("XSRF-TOKEN"); err == nil {
-			token, _ = url.QueryUnescape(cookie.Value)
-		}
-	} else {
-		token = r.FormValue("xsrfToken")
-	}
-
-	return api.Context{
-		Context:   r.Context(),
-		Cookies:   r.Cookies(),
-		XSRFToken: token,
 	}
 }
