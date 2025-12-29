@@ -18,13 +18,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func getContext(cookies []*http.Cookie) Context {
-	return Context{
-		Context:   context.Background(),
-		Cookies:   cookies,
-		XSRFToken: "abcde",
-	}
+type mockJWTClient struct {
 }
+
+func (m *mockJWTClient) CreateJWT(ctx context.Context) string {
+	return "jwt"
+}
+
+//func getContext(cookies []*http.Cookie) Context {
+//	return Context{
+//		Context:   context.Background(),
+//		Cookies:   cookies,
+//		XSRFToken: "abcde",
+//	}
+//}
 
 func TestClientError(t *testing.T) {
 	assert.Equal(t, "message", ClientError("message").Error())
@@ -116,7 +123,7 @@ func TestLogResponseIgnoresContextCanceled(t *testing.T) {
 }
 
 type MockFileStorage struct {
-	err        error
+	err error
 }
 
 func (m *MockFileStorage) StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error) {

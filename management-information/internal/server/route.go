@@ -3,7 +3,6 @@ package server
 import (
 	"errors"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 )
 
@@ -33,26 +32,17 @@ func (r route) execute(w http.ResponseWriter, req *http.Request, data any) error
 		if !ok {
 			return errors.New("no auth context in request")
 		}
-		group, groupCtx := errgroup.WithContext(ctx)
-		ctx = ctx.WithContext(groupCtx)
 		data := PageData{
 			Data:           data,
 			SuccessMessage: r.getSuccess(req),
 		}
 
-		group.Go(func() error {
-			user, err := r.client.GetCurrentUserDetails(ctx)
-			if err != nil {
-				return err
-			}
-			if !user.IsReportingUser() {
-				return errors.New("not reporting user")
-			}
-			return nil
-		})
-
-		if err := group.Wait(); err != nil {
+		user, err := r.client.GetCurrentUserDetails(ctx)
+		if err != nil {
 			return err
+		}
+		if !user.IsReportingUser() {
+			return errors.New("not reporting user")
 		}
 
 		return r.tmpl.Execute(w, data)

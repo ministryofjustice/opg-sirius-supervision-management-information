@@ -12,8 +12,8 @@ import (
 
 func TestGetBondProviders(t *testing.T) {
 	logger, mockClient := SetUpTest()
-
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger, "")
+	mockJwtClient := &mockJWTClient{}
+	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	json := `[{
 			  "id": 1,
@@ -43,7 +43,7 @@ func TestGetBondProviders(t *testing.T) {
 		{Id: 3, Name: "DBS"},
 	}
 
-	bondProviders, err := client.GetBondProviders(getContext(nil))
+	bondProviders, err := client.GetBondProviders(nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, expectedResponse, bondProviders)
@@ -51,8 +51,9 @@ func TestGetBondProviders(t *testing.T) {
 
 func TestGetBondProvidersUnauthorised(t *testing.T) {
 	logger, mockClient := SetUpTest()
+	mockJwtClient := &mockJWTClient{}
 
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger, "")
+	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	mocks.GetDoFunc = func(*http.Request) (*http.Response, error) {
 		return &http.Response{
@@ -61,7 +62,7 @@ func TestGetBondProvidersUnauthorised(t *testing.T) {
 		}, nil
 	}
 
-	_, err := client.GetBondProviders(getContext(nil))
+	_, err := client.GetBondProviders(nil)
 
 	assert.Equal(t, ErrUnauthorized.Error(), err.Error())
 }

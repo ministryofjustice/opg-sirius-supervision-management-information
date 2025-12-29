@@ -62,7 +62,7 @@ func Test_processUpload(t *testing.T) {
 			err: tt.fileStorageError,
 		}
 
-		server := NewServer(mockS3, "async-bucket")
+		server := NewServer(mockS3, "async-bucket", nil)
 
 		var body bytes.Buffer
 

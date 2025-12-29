@@ -14,7 +14,8 @@ import (
 func TestUploadSuccess(t *testing.T) {
 	logger, mockClient := SetUpTest()
 
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger, "")
+	mockJwtClient := &mockJWTClient{}
+	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	data := shared.Upload{
 		UploadType: shared.ParseUploadType("BONDS"),
@@ -29,14 +30,15 @@ func TestUploadSuccess(t *testing.T) {
 		}, nil
 	}
 
-	err := client.Upload(getContext(nil), data)
+	err := client.Upload(nil, data)
 	assert.NoError(t, err)
 }
 
 func TestSubmitUploadReturns500Error(t *testing.T) {
 	logger, mockClient := SetUpTest()
 
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger, "")
+	mockJwtClient := &mockJWTClient{}
+	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	mocks.GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		return &http.Response{
@@ -46,7 +48,7 @@ func TestSubmitUploadReturns500Error(t *testing.T) {
 		}, nil
 	}
 
-	err := client.Upload(getContext(nil), shared.Upload{})
+	err := client.Upload(nil, shared.Upload{})
 
 	assert.Equal(t, StatusError{
 		Code:   http.StatusInternalServerError,
@@ -58,7 +60,8 @@ func TestSubmitUploadReturns500Error(t *testing.T) {
 func TestSubmitUploadReturnsBadRequestError(t *testing.T) {
 	logger, mockClient := SetUpTest()
 
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger, "")
+	mockJwtClient := &mockJWTClient{}
+	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	mocks.GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		return &http.Response{
@@ -68,7 +71,7 @@ func TestSubmitUploadReturnsBadRequestError(t *testing.T) {
 		}, nil
 	}
 
-	err := client.Upload(getContext(nil), shared.Upload{})
+	err := client.Upload(nil, shared.Upload{})
 
 	assert.Equal(t, StatusError{
 		Code:   http.StatusBadRequest,

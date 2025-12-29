@@ -51,7 +51,7 @@ func New(logger *slog.Logger, client ApiClient, templates map[string]*template.T
 	handleMux("POST /uploads", &UploadFileHandler{&route{client: client, tmpl: templates["uploads.gotmpl"], partial: "error-summary"}})
 
 	mux.Handle("/health-check", healthCheck())
-	//mux.Handle("/", http.RedirectHandler(envVars.Prefix+"/downloads", http.StatusFound)) // Commented out - this MIGHT be overwriting auth.Context to context.Context
+	mux.Handle("/", http.RedirectHandler(envVars.Prefix+"/downloads", http.StatusFound))
 
 	static := http.FileServer(http.Dir(envVars.WebDir + "/static"))
 	mux.Handle("/assets/", static)

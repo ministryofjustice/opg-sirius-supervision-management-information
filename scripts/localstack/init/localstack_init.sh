@@ -27,4 +27,3 @@ create_bucket() {
 
 # S3
 create_bucket "opg-backoffice-async-uploads-local"
-#awslocal s3 cp /scripts/files/feemoto_01042025normal.csv s3://opg-backoffice-async-uploads-local/

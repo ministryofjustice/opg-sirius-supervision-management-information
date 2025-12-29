@@ -13,8 +13,8 @@ import (
 
 func TestGetCurrentUserDetails(t *testing.T) {
 	logger, mockClient := SetUpTest()
-
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger, "")
+	mockJwtClient := &mockJWTClient{}
+	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	json := `{
 			   "id":65,
@@ -45,7 +45,7 @@ func TestGetCurrentUserDetails(t *testing.T) {
 		}, nil
 	}
 
-	expectedResponse := shared.User{
+	expectedResponse := model.User{
 		Id:          65,
 		PhoneNumber: "12345678",
 		Name:        "case manager",
@@ -58,35 +58,37 @@ func TestGetCurrentUserDetails(t *testing.T) {
 		Suspended:   false,
 	}
 
-	teams, err := client.GetCurrentUserDetails(getContext(nil))
+	teams, err := client.GetCurrentUserDetails(nil)
 	assert.Equal(t, expectedResponse, teams)
 	assert.Equal(t, nil, err)
 }
 
 func TestGetCurrentUserDetailsReturnsUnauthorisedClientError(t *testing.T) {
 	logger, _ := SetUpTest()
+	mockJwtClient := &mockJWTClient{}
 
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 	}))
 	defer svr.Close()
 
-	client, _ := NewApiClient(http.DefaultClient, svr.URL, logger, "")
-	_, err := client.GetCurrentUserDetails(getContext(nil))
+	client, _ := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
+	_, err := client.GetCurrentUserDetails(nil)
 	assert.Equal(t, ErrUnauthorized, err)
 }
 
 func TestMyDetailsReturns500Error(t *testing.T) {
 	logger, _ := SetUpTest()
+	mockJwtClient := &mockJWTClient{}
 
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
 	defer svr.Close()
 
-	client, _ := NewApiClient(http.DefaultClient, svr.URL, logger, "")
+	client, _ := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
 
-	_, err := client.GetCurrentUserDetails(getContext(nil))
+	_, err := client.GetCurrentUserDetails(nil)
 	assert.Equal(t, StatusError{
 		Code:   http.StatusInternalServerError,
 		URL:    svr.URL + "/v1/users/current",
@@ -96,8 +98,9 @@ func TestMyDetailsReturns500Error(t *testing.T) {
 
 func TestMyDetailsReturns200(t *testing.T) {
 	logger, mockClient := SetUpTest()
+	mockJwtClient := &mockJWTClient{}
 
-	client, _ := NewApiClient(&mockClient, "http://localhost:3000", logger, "")
+	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	json := `{
 		"id": 55,
@@ -126,7 +129,7 @@ func TestMyDetailsReturns200(t *testing.T) {
 		}, nil
 	}
 
-	expectedResponse := shared.User{
+	expectedResponse := model.User{
 		Id:          55,
 		PhoneNumber: "12345678",
 		Name:        "case manager",
@@ -139,7 +142,7 @@ func TestMyDetailsReturns200(t *testing.T) {
 		Suspended:   false,
 	}
 
-	user, err := client.GetCurrentUserDetails(getContext(nil))
+	user, err := client.GetCurrentUserDetails(nil)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, user, expectedResponse)
 }
