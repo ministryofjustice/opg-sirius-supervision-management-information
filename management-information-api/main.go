@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/ministryofjustice/opg-go-common/env"
 	"github.com/opg-sirius-supervision-management-information/management-information-api/internal/auth"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"log/slog"
 	"net/http"
 	"os"
@@ -34,6 +36,11 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
+	httpClient := http.DefaultClient
+	httpClient.Transport = otelhttp.NewTransport(httpClient.Transport)
+
+	supervisionAPIPath := env.Get("SUPERVISION_API_PATH", "/supervision-api")
+
 	envs := &api.Envs{
 		Port:            os.Getenv("PORT"),
 		AwsRegion:       os.Getenv("AWS_REGION"),
@@ -42,6 +49,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		S3EncryptionKey: os.Getenv("S3_ENCRYPTION_KEY"),
 		AsyncBucket:     os.Getenv("ASYNC_BUCKET"),
 		JWTSecret:       os.Getenv("JWT_SECRET"),
+		SiriusURL:       os.Getenv("SIRIUS_URL"),
 	}
 
 	fileStorageClient, err := filestorage.NewClient(
@@ -56,9 +64,9 @@ func run(ctx context.Context, logger *slog.Logger) error {
 		return err
 	}
 
-	server := api.NewServer(fileStorageClient, envs.AsyncBucket, &auth.JWT{
+	server := api.NewServer(http.DefaultClient, fileStorageClient, envs.AsyncBucket, &auth.JWT{
 		Secret: envs.JWTSecret,
-	})
+	}, envs.SiriusURL+supervisionAPIPath)
 
 	s := &http.Server{
 		Addr:              ":" + envs.Port,

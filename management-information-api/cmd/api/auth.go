@@ -46,7 +46,15 @@ func (s *Server) authorise(role string) func(http.Handler) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context().(auth.Context)
 
-			if !ctx.User.HasRole(role) {
+			user, err := s.GetCurrentUserDetails(ctx)
+			if err != nil {
+				http.Error(w, "Error", http.StatusInternalServerError)
+				return
+			}
+
+			ctx.User = &user
+
+			if !user.HasRole(role) {
 				http.Error(w, "Forbidden", http.StatusForbidden)
 				return
 			}

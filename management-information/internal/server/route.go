@@ -28,7 +28,9 @@ func (r route) execute(w http.ResponseWriter, req *http.Request, data any) error
 	if IsHxRequest(req) {
 		return r.tmpl.ExecuteTemplate(w, r.partial, data)
 	} else {
+
 		ctx, ok := req.Context().(auth.Context)
+
 		if !ok {
 			return errors.New("no auth context in request")
 		}

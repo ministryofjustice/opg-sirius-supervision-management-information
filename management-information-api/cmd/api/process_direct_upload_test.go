@@ -58,11 +58,12 @@ func Test_processUpload(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		_, mockClient := SetUpTest()
 		mockS3 := &mockFileStorage{
 			err: tt.fileStorageError,
 		}
 
-		server := NewServer(mockS3, "async-bucket", nil)
+		server := NewServer(&mockClient, mockS3, "async-bucket", nil, "")
 
 		var body bytes.Buffer
 
