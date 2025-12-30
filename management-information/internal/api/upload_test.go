@@ -2,7 +2,9 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"encoding/base64"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +32,12 @@ func TestUploadSuccess(t *testing.T) {
 		}, nil
 	}
 
-	err := client.Upload(nil, data)
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
+	err := client.Upload(ctx, data)
 	assert.NoError(t, err)
 }
 
@@ -48,7 +55,12 @@ func TestSubmitUploadReturns500Error(t *testing.T) {
 		}, nil
 	}
 
-	err := client.Upload(nil, shared.Upload{})
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
+	err := client.Upload(ctx, shared.Upload{})
 
 	assert.Equal(t, StatusError{
 		Code:   http.StatusInternalServerError,
@@ -71,7 +83,12 @@ func TestSubmitUploadReturnsBadRequestError(t *testing.T) {
 		}, nil
 	}
 
-	err := client.Upload(nil, shared.Upload{})
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
+	err := client.Upload(ctx, shared.Upload{})
 
 	assert.Equal(t, StatusError{
 		Code:   http.StatusBadRequest,

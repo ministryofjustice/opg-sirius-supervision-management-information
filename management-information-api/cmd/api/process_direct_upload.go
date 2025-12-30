@@ -18,11 +18,13 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 	defer unchecked(r.Body.Close)
 
 	if err := json.NewDecoder(r.Body).Decode(&upload); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		return err
 	}
 
 	fileBytes, err := base64.StdEncoding.DecodeString(upload.Base64Data)
 	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
 		return err
 	}
 
@@ -32,6 +34,7 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 	_, err = s.fileStorage.StreamFile(context.Background(), s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
 
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return err
 	}
 

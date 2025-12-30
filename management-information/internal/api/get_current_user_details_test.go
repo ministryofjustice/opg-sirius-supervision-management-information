@@ -2,8 +2,10 @@ package api
 
 import (
 	"bytes"
+	"context"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -45,20 +47,18 @@ func TestGetCurrentUserDetails(t *testing.T) {
 		}, nil
 	}
 
-	expectedResponse := model.User{
-		Id:          65,
-		PhoneNumber: "12345678",
-		Name:        "case manager",
-		Deleted:     false,
-		Email:       "case.manager@opgtest.com",
-		Firstname:   "case",
-		Surname:     "manager",
+	expectedResponse := shared.User{
+		ID:          65,
+		DisplayName: "case manager",
 		Roles:       []string{"Case Manager"},
-		Locked:      false,
-		Suspended:   false,
 	}
 
-	teams, err := client.GetCurrentUserDetails(nil)
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
+	teams, err := client.GetCurrentUserDetails(ctx)
 	assert.Equal(t, expectedResponse, teams)
 	assert.Equal(t, nil, err)
 }
@@ -72,8 +72,13 @@ func TestGetCurrentUserDetailsReturnsUnauthorisedClientError(t *testing.T) {
 	}))
 	defer svr.Close()
 
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
 	client, _ := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
-	_, err := client.GetCurrentUserDetails(nil)
+	_, err := client.GetCurrentUserDetails(ctx)
 	assert.Equal(t, ErrUnauthorized, err)
 }
 
@@ -86,9 +91,14 @@ func TestMyDetailsReturns500Error(t *testing.T) {
 	}))
 	defer svr.Close()
 
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
 	client, _ := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
 
-	_, err := client.GetCurrentUserDetails(nil)
+	_, err := client.GetCurrentUserDetails(ctx)
 	assert.Equal(t, StatusError{
 		Code:   http.StatusInternalServerError,
 		URL:    svr.URL + "/v1/users/current",
@@ -129,20 +139,18 @@ func TestMyDetailsReturns200(t *testing.T) {
 		}, nil
 	}
 
-	expectedResponse := model.User{
-		Id:          55,
-		PhoneNumber: "12345678",
-		Name:        "case manager",
-		Deleted:     false,
-		Email:       "case.manager@opgtest.com",
-		Firstname:   "case",
-		Surname:     "manager",
+	expectedResponse := shared.User{
+		ID:          55,
+		DisplayName: "case manager",
 		Roles:       []string{"OPG User", "Case Manager"},
-		Locked:      false,
-		Suspended:   false,
 	}
 
-	user, err := client.GetCurrentUserDetails(nil)
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
+	user, err := client.GetCurrentUserDetails(ctx)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, user, expectedResponse)
 }

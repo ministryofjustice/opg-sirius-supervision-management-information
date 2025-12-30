@@ -2,6 +2,8 @@ package api
 
 import (
 	"bytes"
+	"context"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +45,12 @@ func TestGetBondProviders(t *testing.T) {
 		{Id: 3, Name: "DBS"},
 	}
 
-	bondProviders, err := client.GetBondProviders(nil)
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
+	bondProviders, err := client.GetBondProviders(ctx)
 	assert.NoError(t, err)
 
 	assert.Equal(t, expectedResponse, bondProviders)
@@ -62,7 +69,12 @@ func TestGetBondProvidersUnauthorised(t *testing.T) {
 		}, nil
 	}
 
-	_, err := client.GetBondProviders(nil)
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
+		Context: context.Background(),
+	}
+
+	_, err := client.GetBondProviders(ctx)
 
 	assert.Equal(t, ErrUnauthorized.Error(), err.Error())
 }

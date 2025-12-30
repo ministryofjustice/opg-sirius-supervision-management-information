@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 	"errors"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
+	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -24,12 +24,10 @@ func TestRoute_htmxRequest_withPermissions(t *testing.T) {
 	for i, test := range tests {
 		t.Run("Scenario "+strconv.Itoa(i), func(t *testing.T) {
 			client := mockApiClient{
-				User: model.User{
-					Id:      123,
-					Name:    "Test User",
-					Deleted: false,
-					Email:   "test@user.com",
-					Roles:   test.userRoles,
+				User: shared.User{
+					ID:          123,
+					DisplayName: "Test User",
+					Roles:       test.userRoles,
 				},
 			}
 			template := &mockTemplate{}
@@ -70,19 +68,17 @@ func TestRoute_fullPage_with_reportingUserPermissions(t *testing.T) {
 	for i, test := range tests {
 		t.Run("Scenario "+strconv.Itoa(i), func(t *testing.T) {
 			client := mockApiClient{
-				User: model.User{
-					Id:        123,
-					Name:      "Test User",
-					Email:     "test@user.com",
-					Firstname: "Test",
-					Surname:   "User",
-					Roles:     test.userRoles,
+				User: shared.User{
+					ID:          123,
+					DisplayName: "Test User",
+					Roles:       test.userRoles,
 				},
 			}
 			template := &mockTemplate{}
 
 			w := httptest.NewRecorder()
-			ctx := api.Context{
+			ctx := auth.Context{
+				User:    &shared.User{ID: 123},
 				Context: context.Background(),
 			}
 			r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
@@ -111,16 +107,17 @@ func TestRoute_fullPage_with_reportingUserPermissions(t *testing.T) {
 
 func TestRoute_error(t *testing.T) {
 	client := mockApiClient{
-		User: model.User{
-			Id:    123,
-			Name:  "Test User",
-			Roles: []string{"Reporting User"},
+		User: shared.User{
+			ID:          123,
+			DisplayName: "Test User",
+			Roles:       []string{"Reporting User"},
 		},
 		Error: errors.New("it broke"),
 	}
 	template := &mockTemplate{}
 	w := httptest.NewRecorder()
-	ctx := api.Context{
+	ctx := auth.Context{
+		User:    &shared.User{ID: 123},
 		Context: context.Background(),
 	}
 	r, _ := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)

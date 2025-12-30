@@ -77,7 +77,14 @@ func Test_processUpload(t *testing.T) {
 		r, _ := http.NewRequestWithContext(ctx, http.MethodPost, "/upload", &body)
 		w := httptest.NewRecorder()
 
-		server.ProcessDirectUpload(w, r)
+		err := server.ProcessDirectUpload(w, r)
+
+		if tt.expectedStatusCode == http.StatusOK {
+			assert.Nil(t, err)
+		} else {
+			assert.NotNil(t, err)
+		}
+
 		assert.Equal(t, tt.expectedStatusCode, w.Result().StatusCode)
 		if expectedFileName != "" {
 			assert.Equal(t, expectedFileName, mockS3.fileName)
