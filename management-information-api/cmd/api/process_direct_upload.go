@@ -14,7 +14,7 @@ import (
 
 func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) error {
 	var upload shared.Upload
-	ctx := context.Background()
+	ctx := r.Context()
 
 	defer unchecked(r.Body.Close)
 
