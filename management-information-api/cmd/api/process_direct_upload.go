@@ -14,6 +14,7 @@ import (
 
 func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) error {
 	var upload shared.Upload
+	ctx := context.Background()
 
 	defer unchecked(r.Body.Close)
 
@@ -34,6 +35,7 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 	_, err = s.fileStorage.StreamFile(context.Background(), s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
 
 	if err != nil {
+		s.Logger(ctx).Error("Unable to upload file: ", "err", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return err
 	}
