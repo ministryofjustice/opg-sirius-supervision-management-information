@@ -94,12 +94,19 @@ func (s *Server) SetupRoutes(logger *slog.Logger) http.Handler {
 	return otelhttp.NewHandler(telemetry.Middleware(logger)(securityheaders.Use(mux)), "supervision-finance-api")
 }
 
+func addCookiesFromContext(ctx context.Context, req *http.Request) {
+	for _, c := range ctx.(auth.Context).Cookies {
+		req.AddCookie(c)
+	}
+}
+
 func (s *Server) newRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequestWithContext(ctx, method, s.baseURL+path, body)
 	if err != nil {
 		return nil, err
 	}
 
+	addCookiesFromContext(ctx, req)
 	req.Header.Add("OPG-Bypass-Membrane", "1")
 
 	return req, err
