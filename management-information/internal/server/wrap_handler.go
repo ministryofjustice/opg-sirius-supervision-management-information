@@ -81,7 +81,7 @@ func wrapHandler(errTmpl Template, errPartial string, envVars EnvironmentVars) f
 					Error:           err.Error(),
 					EnvironmentVars: envVars,
 				}
-				if IsHxRequest(r) {
+				if IsHxRequest(r) && r.Method == http.MethodGet {
 					err = errTmpl.ExecuteTemplate(w, errPartial, errVars)
 				} else {
 					err = errTmpl.Execute(w, errVars)
