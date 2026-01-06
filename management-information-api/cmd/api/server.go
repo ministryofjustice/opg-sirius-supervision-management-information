@@ -94,17 +94,6 @@ func (s *Server) SetupRoutes(logger *slog.Logger) http.Handler {
 	return otelhttp.NewHandler(telemetry.Middleware(logger)(securityheaders.Use(mux)), "supervision-finance-api")
 }
 
-func (s *Server) newRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequestWithContext(ctx, method, s.baseURL+path, body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("OPG-Bypass-Membrane", "1")
-
-	return req, err
-}
-
 // unchecked allows errors to be unchecked when deferring a function, e.g. closing a reader where a failure would only
 // occur when the process is likely to already be unrecoverable
 func unchecked(f func() error) {
