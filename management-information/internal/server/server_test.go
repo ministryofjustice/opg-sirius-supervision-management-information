@@ -1,0 +1,67 @@
+package server
+
+import (
+	"context"
+	"github.com/opg-sirius-supervision-management-information/shared"
+	"io"
+	"net/http"
+)
+
+type mockTemplate struct {
+	executed         bool
+	executedTemplate bool
+	lastVars         interface{}
+	lastW            io.Writer
+	error            error
+}
+
+type mockRoute struct {
+	client   ApiClient
+	data     any
+	executed bool
+	lastW    io.Writer
+	error
+}
+
+func (r *mockRoute) Client() ApiClient {
+	return r.client
+}
+
+func (r *mockRoute) execute(w http.ResponseWriter, req *http.Request, data any) error {
+	r.executed = true
+	r.lastW = w
+	r.data = data
+	return r.error
+}
+
+func (m *mockTemplate) Execute(w io.Writer, vars any) error {
+	m.executed = true
+	m.lastVars = vars
+	m.lastW = w
+	return m.error
+}
+
+func (m *mockTemplate) ExecuteTemplate(w io.Writer, name string, vars any) error {
+	m.executedTemplate = true
+	m.lastVars = vars
+	m.lastW = w
+	return m.error
+}
+
+type mockApiClient struct {
+	Error         error
+	User          shared.User
+	BondProviders []shared.BondProvider
+}
+
+func (m mockApiClient) GetCurrentUserDetails(context context.Context) (shared.User, error) {
+	return m.User, m.Error
+}
+
+func (m mockApiClient) GetBondProviders(context context.Context) (shared.BondProviders, error) {
+	return m.BondProviders, m.Error
+}
+
+func (m mockApiClient) Upload(context context.Context, data shared.Upload) error {
+	return m.Error
+}
