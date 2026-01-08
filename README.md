@@ -24,8 +24,8 @@ is also provided via a Yarn watch command.
 
 -----
 
-Running without docker with:
-`yarn install && yarn build`
+Running without docker with: <br>
+`yarn install && yarn build` <br>
 `go run main.go`
 
 This will host at:
@@ -33,13 +33,15 @@ This will host at:
 
 -----
 ## Run the unit tests
-
 `make test`
 
-## Run the Cypress tests not in UI
-`make build-all`
+## Run *one* Cypress test headless (i.e. not in UI)
+`make cypress-single SPEC=upload.cy.js`
+
+## Run *all* the Cypress tests headless
+`make build-all` (optional) <br>
 `make cypress`
 
 ## Run the Cypress tests in UI
-`make up` in one terminal (wait for the app to build)
+`make up` in one terminal (wait for the app to build) <br>
 `npx cypress open baseUrl=http://localhost:7777/downloads` in another terminal

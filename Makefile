@@ -44,3 +44,6 @@ compile-assets:
 
 cypress: setup-directories clean
 	docker compose run --build cypress
+
+cypress-single: setup-directories clean
+	docker compose run --rm cypress run --spec e2e/$(SPEC)
