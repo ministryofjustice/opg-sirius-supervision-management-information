@@ -3,4 +3,4 @@ cypress/screenshots
 cypress/videos
 tmp
 main
-web/static
+management-information/web/static
