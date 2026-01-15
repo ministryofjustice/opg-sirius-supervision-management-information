@@ -63,7 +63,7 @@ services:
         condition: service_healthy
 
   go-lint:
-    image: golangci/golangci-lint:v2.4.0
+    image: golangci/golangci-lint:v2.8.0
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
@@ -98,7 +98,7 @@ services:
       - ./management-information:/home/node/app
 
   localstack:
-    image: localstack/localstack:4.7
+    image: localstack/localstack:4.12
     volumes:
       - "./scripts/localstack/init:/etc/localstack/init/ready.d"
       - "./scripts/localstack/files:/scripts/files"
