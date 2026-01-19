@@ -1,13 +1,17 @@
 package server
 
 import (
+	"bytes"
 	"encoding/base64"
+	"encoding/csv"
 	"fmt"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
-	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/ministryofjustice/opg-go-common/telemetry"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
+	"github.com/opg-sirius-supervision-management-information/shared"
 )
 
 type UploadFileVars struct {
@@ -59,14 +63,34 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 
 		file, handler, err := r.FormFile("fileUpload")
 		if err != nil {
-			return err
+			data.ValidationErrors = model.ValidationErrors{
+				"FileUpload": map[string]string{"required": "No file uploaded"},
+			}
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			return h.execute(w, r, data)
 		}
 
 		unchecked(file.Close)
 
 		fileData, err := io.ReadAll(file)
 		if err != nil {
-			return err
+			telemetry.LoggerFromContext(ctx).Error("unable to read file", "error", err)
+			data.ValidationErrors = model.ValidationErrors{
+				"FileUpload": map[string]string{"invalid": "Failed to read file"},
+			}
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			return h.execute(w, r, data)
+		}
+
+		csvReader := csv.NewReader(bytes.NewReader(fileData))
+		rec, err := csvReader.ReadAll()
+		if err != nil || len(rec) == 0 {
+			telemetry.LoggerFromContext(ctx).Error("unable to read csv data", "error", err, "records", len(rec))
+			data.ValidationErrors = model.ValidationErrors{
+				"FileUpload": map[string]string{"invalid": "File does not contain valid CSV data"},
+			}
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			return h.execute(w, r, data)
 		}
 
 		err = h.router.Client().Upload(ctx, shared.Upload{
