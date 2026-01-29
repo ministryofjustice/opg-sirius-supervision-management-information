@@ -28,6 +28,8 @@ test: setup-directories
 scan: setup-directories
 	docker compose run --rm trivy image --format table --exit-code 0 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest
 	docker compose run --rm trivy image --format sarif --output /test-results/management-info.sarif --exit-code 1 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information:latest
+	docker compose run --rm trivy image --format table --exit-code 0 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information-api:latest
+	docker compose run --rm trivy image --format sarif --output /test-results/management-info.sarif --exit-code 1 311462405659.dkr.ecr.eu-west-1.amazonaws.com/sirius/sirius-management-information-api:latest
 
 clean:
 	docker compose down
