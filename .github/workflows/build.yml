@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Go 1.24.0
+      - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
           go-version: 1.25.6
@@ -178,19 +178,20 @@ jobs:
           registries: 311462405659
 
       - name: Run Trivy vulnerability scanner
+        if: matrix.scan == 1
         env:
           TRIVY_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-db:2
           TRIVY_JAVA_DB_REPOSITORY: ${{ steps.login-ecr.outputs.registry }}/trivy-db-public-ecr/aquasecurity/trivy-java-db:1
           DOCKER_USERNAME: ${{ steps.login-ecr.outputs.docker_username_311462405659_dkr_ecr_eu_west_1_amazonaws_com }}
           DOCKER_PASSWORD: ${{ steps.login-ecr.outputs.docker_password_311462405659_dkr_ecr_eu_west_1_amazonaws_com }}
-        run: make scan
-
+        run: make scan-${{ matrix.service_name }}
+          
       - name: Upload Trivy scan results to GitHub Security tab
+        if: matrix.scan == 1
         uses: github/codeql-action/upload-sarif@19b2f06db2b6f5108140aeb04014ef02b648f789 # v4.31.11
-        if: always()
         with:
           sarif_file: 'test-results/'
-          category: trivy-docker-management-information
+          category: trivy-docker-management-information-${{ matrix.service_name }}
 
       - name: Push
         run: |
