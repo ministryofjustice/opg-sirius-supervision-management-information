@@ -3,15 +3,16 @@ package api
 import (
 	"bytes"
 	"context"
+	"io"
+	"log/slog"
+	"net/http"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information-api/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"io"
-	"log/slog"
-	"net/http"
 )
 
 type Service interface {
@@ -82,9 +83,7 @@ func (s *Server) SetupRoutes(logger *slog.Logger) http.Handler {
 	// authFunc is a replacement for mux.HandleFunc
 	// which enriches the handler's HTTP instrumentation with the pattern as the http.route.
 	authFunc := func(pattern string, role string, h handlerFunc) {
-		// Configure the "http.route" for the HTTP instrumentation.
-		handler := otelhttp.WithRouteTag(pattern, h)
-		mux.Handle(pattern, s.authenticateAPI(s.requestLogger(s.authorise(role)(handler))))
+		mux.Handle(pattern, s.authenticateAPI(s.requestLogger(s.authorise(role)(h))))
 	}
 
 	authFunc("POST /uploads", shared.RoleReportingUser, s.ProcessDirectUpload)
