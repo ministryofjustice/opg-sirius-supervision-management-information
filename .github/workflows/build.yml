@@ -75,7 +75,7 @@ jobs:
         run: make gosec
       - name: Upload GoSec results to GitHub Security tab
         if: ${{ always() }}
-        uses: github/codeql-action/upload-sarif@6bc82e05fd0ea64601dd4b465378bbcf57de0314 # v4.32.1
+        uses: github/codeql-action/upload-sarif@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4.32.2
         with:
           sarif_file: 'test-results/gosec.sarif'
           category: gosec
@@ -188,7 +188,7 @@ jobs:
           
       - name: Upload Trivy scan results to GitHub Security tab
         if: matrix.scan == 1
-        uses: github/codeql-action/upload-sarif@6bc82e05fd0ea64601dd4b465378bbcf57de0314 # v4.32.1
+        uses: github/codeql-action/upload-sarif@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4.32.2
         with:
           sarif_file: 'test-results/'
           category: trivy-docker-management-information-${{ matrix.service_name }}
