@@ -99,7 +99,7 @@ services:
       - ./management-information:/home/node/app
 
   localstack:
-    image: localstack/localstack:4.12
+    image: localstack/localstack:4.13
     volumes:
       - "./scripts/localstack/init:/etc/localstack/init/ready.d"
       - "./scripts/localstack/files:/scripts/files"
