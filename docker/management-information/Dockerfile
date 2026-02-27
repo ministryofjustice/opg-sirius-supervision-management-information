@@ -16,7 +16,7 @@ ENV CGO_ENABLED=0 GOOS=linux
 RUN update-ca-certificates
 RUN apk add --no-cache tzdata
 
-FROM node:22-alpine3.19 AS asset-env
+FROM node:24-alpine3.23 AS asset-env
 WORKDIR /app
 
 RUN mkdir -p web/static
