@@ -2,27 +2,23 @@ package filestorage
 
 import (
 	"context"
+	"io"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials/stscreds"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"io"
 )
 
 type S3Client interface {
 	Options() s3.Options
-}
-
-type Uploader interface {
-	Upload(ctx context.Context, input *s3.PutObjectInput, opts ...func(*manager.Uploader)) (*manager.UploadOutput, error)
+	PutObject(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error)
 }
 
 type Client struct {
-	s3       S3Client
-	kmsKey   string
-	uploader Uploader
+	s3     S3Client
+	kmsKey string
 }
 
 func NewClient(ctx context.Context, region string, iamRole string, endpoint string, kmsKey string) (*Client, error) {
@@ -50,17 +46,14 @@ func NewClient(ctx context.Context, region string, iamRole string, endpoint stri
 		}
 	})
 
-	uploader := manager.NewUploader(s3Client)
-
 	return &Client{
-		s3:       s3Client,
-		kmsKey:   kmsKey,
-		uploader: uploader,
+		s3:     s3Client,
+		kmsKey: kmsKey,
 	}, nil
 }
 
 func (c *Client) StreamFile(ctx context.Context, bucketName string, fileName string, stream io.ReadCloser) (*string, error) {
-	output, err := c.uploader.Upload(ctx, &s3.PutObjectInput{
+	output, err := c.s3.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:               aws.String(bucketName),
 		Key:                  aws.String(fileName),
 		Body:                 stream,
@@ -73,5 +66,5 @@ func (c *Client) StreamFile(ctx context.Context, bucketName string, fileName str
 		return nil, err
 	}
 
-	return output.VersionID, err
+	return output.VersionId, err
 }
