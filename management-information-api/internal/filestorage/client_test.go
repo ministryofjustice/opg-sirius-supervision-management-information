@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewClient(t *testing.T) {
@@ -24,11 +24,11 @@ func TestNewClient(t *testing.T) {
 }
 
 type mockUploader struct {
-	output *manager.UploadOutput
+	output *transfermanager.UploadObjectOutput
 	err    error
 }
 
-func (m *mockUploader) Upload(ctx context.Context, input *s3.PutObjectInput, opts ...func(*manager.Uploader)) (*manager.UploadOutput, error) {
+func (m *mockUploader) UploadObject(ctx context.Context, input *transfermanager.UploadObjectInput, opts ...func(*transfermanager.Options)) (*transfermanager.UploadObjectOutput, error) {
 	return m.output, m.err
 }
 
@@ -43,7 +43,7 @@ func TestStreamFile(t *testing.T) {
 		{
 			name: "success",
 			mockUploader: &mockUploader{
-				output: &manager.UploadOutput{VersionID: &versionId},
+				output: &transfermanager.UploadObjectOutput{VersionID: &versionId},
 			},
 			want:    &versionId,
 			wantErr: nil,
