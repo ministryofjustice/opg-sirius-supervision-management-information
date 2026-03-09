@@ -1,4 +1,4 @@
-FROM golang:1.25.7-alpine AS base
+FROM golang:1.25.8-alpine AS base
 
 RUN adduser \
     --disabled-password \
