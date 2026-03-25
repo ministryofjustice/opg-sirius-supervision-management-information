@@ -20,4 +20,3 @@ cypress/downloads
 .DS_Store
 .cache
 .gocache
-.trivy-cache
