@@ -1,5 +1,5 @@
 # opg-sirius-supervision-management-information
-
+trigger workflow
 ### Major dependencies
 
 - [Go](https://golang.org/) (>= 1.22)
