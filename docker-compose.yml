@@ -64,7 +64,7 @@ services:
         condition: service_healthy
 
   go-lint:
-    image: golangci/golangci-lint:v2.10.1
+    image: golangci/golangci-lint:v2.11.4
     working_dir: /go/src/app
     volumes:
       - ./:/go/src/app
@@ -72,7 +72,7 @@ services:
     command: golangci-lint run -v --timeout 5m
 
   gosec:
-     image: securego/gosec:2.22.11
+     image: securego/gosec:2.24.6
      working_dir: /app
      volumes:
          - .:/app
@@ -86,7 +86,7 @@ services:
       - ./management-information:/home/node/app
 
   localstack:
-    image: localstack/localstack:4.13
+    image: localstack/localstack:4.14
     volumes:
       - "./scripts/localstack/init:/etc/localstack/init/ready.d"
       - "./scripts/localstack/files:/scripts/files"
