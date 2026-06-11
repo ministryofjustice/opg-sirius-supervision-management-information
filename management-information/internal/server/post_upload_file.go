@@ -27,6 +27,8 @@ type UploadFileHandler struct {
 
 func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
+	// Limit request body size to 10MB to prevent memory exhaustion
+	r.Body = http.MaxBytesReader(w, r.Body, 10<<20)
 
 	bondProviders, err := h.router.Client().GetBondProviders(ctx)
 	if err != nil {
