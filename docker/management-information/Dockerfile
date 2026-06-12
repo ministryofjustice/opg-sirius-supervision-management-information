@@ -25,7 +25,7 @@ COPY management-information/web/assets web/assets
 COPY management-information/package.json .
 COPY management-information/yarn.lock .
 
-RUN yarn install
+RUN yarn install --frozen-lockfile --ignore-scripts
 RUN yarn build
 
 FROM base AS healthcheck-build
