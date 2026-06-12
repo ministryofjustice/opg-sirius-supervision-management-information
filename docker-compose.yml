@@ -48,7 +48,7 @@ services:
 
   json-server:
     build:
-      dockerfile: json-server/Dockerfile
+      dockerfile: docker/json-server/Dockerfile
     ports:
       - '3000:3000'
 
