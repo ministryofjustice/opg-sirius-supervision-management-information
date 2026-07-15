@@ -17,7 +17,7 @@
     "@ministryofjustice/frontend": "^2.1.3",
     "govuk-frontend": "^5.4.1",
     "htmx.org": "^2.0.0",
-    "opg-sirius-header": "ministryofjustice/opg-sirius-header#semver:v0.53.8"
+    "opg-sirius-header": "ministryofjustice/opg-sirius-header#ba4b4fd85bcf41311d79364407a085d99c0c29fc"
   },
   "devDependencies": {
     "axe-core": "^4.9.1",
