@@ -9,8 +9,8 @@
     "build:images": "mkdir -p web/static/assets/images && cp node_modules/govuk-frontend/dist/govuk/assets/images/* node_modules/@ministryofjustice/frontend/moj/assets/images/* web/static/assets/images",
     "clean": "rm -rf web/static",
     "test": "cd internal && go test",
-    "cypress": "node_modules/.bin/cypress open",
-    "cypress-ci": "node_modules/.bin/cypress open -c baseUrl=http://localhost:8080",
+    "cypress": "cypress open",
+    "cypress-ci": "cypress open -c baseUrl=http://localhost:8080",
     "lint": "node_modules/.bin/eslint web/assets",
     "watch": "yarn build:css && yarn build:js --watch=forever"
   },
@@ -19,7 +19,7 @@
     "@ministryofjustice/frontend": "^9.0.0",
     "govuk-frontend": "^6.0.0",
     "htmx.org": "^2.0.0",
-    "opg-sirius-header": "ministryofjustice/opg-sirius-header#5c5151248e13b09f62ebce408e0346cae92e07a4"
+    "opg-sirius-header": "ministryofjustice/opg-sirius-header#1bbd33d8fe89643d3c485fc6f27ac4f0ec87287e"
   },
   "devDependencies": {
     "axe-core": "^4.9.1",
