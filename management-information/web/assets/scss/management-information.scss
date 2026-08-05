@@ -1,6 +1,6 @@
 @use "node_modules/@ministryofjustice/frontend/moj/all" as *;
 @use "node_modules/govuk-frontend/dist/govuk" as *;
-$moj-assets-path: "/management-information/assets/";
+$moj-assets-path: "/supervision/management-information/assets/";
 
 .management-info {
   .govuk-width-container,
