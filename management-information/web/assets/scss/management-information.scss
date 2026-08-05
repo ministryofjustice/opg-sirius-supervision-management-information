@@ -1,4 +1,7 @@
-// Sirius specific styles
+@use "node_modules/@ministryofjustice/frontend/moj/all" as *;
+@use "node_modules/govuk-frontend/dist/govuk" as *;
+$moj-assets-path: "/management-information/assets/";
+
 .management-info {
   .govuk-width-container,
   .moj-header__container,
@@ -8,7 +11,8 @@
   }
 
   .govuk-main-wrapper {
-    padding-top: 0px;
+    padding-top: 0;
+    background: govuk-functional-colour("body-background");
   }
 
   .moj-sub-navigation {
@@ -17,6 +21,7 @@
 
   .moj-sub-navigation__link {
     cursor: pointer;
+    text-decoration: none;
   }
 
   .moj-banner--success {
@@ -44,4 +49,38 @@
     padding-left: 45px;
     padding-bottom: 15px;
   }
+}
+
+#footer-background {
+  background: govuk-functional-colour("template-background");
+}
+
+.govuk-footer {
+  border-top: 10px solid;
+  border-top-color: govuk-functional-colour("brand");
+  color: govuk-functional-colour("text");
+  background: govuk-functional-colour("body-background");
+}
+
+@supports (-webkit-mask-position: initial) or (mask-position: initial) {
+  .govuk-footer__copyright-logo::before {
+    mask-image: url("#{$moj-assets-path}images/govuk-crest.svg");
+    mask-repeat: no-repeat;
+    mask-size: 125px 102px;
+    background: currentcolor;
+    mask-position: 50% 0
+  }
+}
+
+.govuk-footer__copyright-logo::before {
+  content: "";
+  display: block;
+  width: 100%;
+  padding-top: 112px;
+  background-image: url("#{$moj-assets-path}images/govuk-crest.svg");
+  background-repeat: no-repeat;
+  background-size: 125px 102px;
+  text-align: center;
+  background-position: 50% 0;
+  white-space: nowrap;
 }
