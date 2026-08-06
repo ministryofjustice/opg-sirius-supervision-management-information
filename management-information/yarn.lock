@@ -1588,9 +1588,9 @@ onetime@^7.0.0:
   dependencies:
     mimic-function "^5.0.0"
 
-opg-sirius-header@ministryofjustice/opg-sirius-header#1bbd33d8fe89643d3c485fc6f27ac4f0ec87287e:
+opg-sirius-header@ministryofjustice/opg-sirius-header#v0.53.19:
   version "1.0.0"
-  resolved "https://codeload.github.com/ministryofjustice/opg-sirius-header/tar.gz/1bbd33d8fe89643d3c485fc6f27ac4f0ec87287e"
+  resolved "https://codeload.github.com/ministryofjustice/opg-sirius-header/tar.gz/10924ffa04018b84f0993caf33c5c78774f5621a"
 
 optionator@^0.9.3:
   version "0.9.4"
