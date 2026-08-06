@@ -11,7 +11,7 @@
     "test": "cd internal && go test",
     "cypress": "cypress open",
     "cypress-ci": "cypress open -c baseUrl=http://localhost:8080",
-    "lint": "node_modules/.bin/eslint web/assets",
+    "lint": "eslint web/assets",
     "watch": "yarn build:css && yarn build:js --watch=forever"
   },
 
@@ -19,7 +19,7 @@
     "@ministryofjustice/frontend": "^9.0.0",
     "govuk-frontend": "^6.0.0",
     "htmx.org": "^2.0.0",
-    "opg-sirius-header": "ministryofjustice/opg-sirius-header#1bbd33d8fe89643d3c485fc6f27ac4f0ec87287e"
+    "opg-sirius-header": "ministryofjustice/opg-sirius-header#semver:v0.53.19"
   },
   "devDependencies": {
     "axe-core": "^4.9.1",
