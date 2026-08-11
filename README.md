@@ -25,6 +25,7 @@ is also provided via a Yarn watch command.
 -----
 
 Running without docker with: <br>
+Cd into /management-information <br>
 `yarn install && yarn build` <br>
 `go run main.go`
 
