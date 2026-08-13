@@ -6,6 +6,7 @@ services:
       target: prod
     ports:
       - "7777:7777"
+    read_only: true
     environment:
       PORT: 7777
       PREFIX: /management-information
@@ -27,6 +28,7 @@ services:
       target: prod
     ports:
       - "7171:7171"
+    read_only: true
     environment:
       PORT: 7171
       HEALTHCHECK: /health-check
