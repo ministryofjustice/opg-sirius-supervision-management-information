@@ -3,14 +3,18 @@ package api
 import (
 	"bytes"
 	"context"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
-	"github.com/opg-sirius-supervision-management-information/shared"
-	"github.com/stretchr/testify/assert"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
+	"github.com/opg-sirius-supervision-management-information/shared"
+	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/pact-foundation/pact-go/v2/matchers"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetCurrentUserDetails(t *testing.T) {
@@ -82,7 +86,7 @@ func TestGetCurrentUserDetailsReturnsUnauthorisedClientError(t *testing.T) {
 	assert.Equal(t, ErrUnauthorized, err)
 }
 
-func TestMyDetailsReturns500Error(t *testing.T) {
+func TestGetCurrentUserDetailsReturns500Error(t *testing.T) {
 	logger, _ := SetUpTest()
 	mockJwtClient := &mockJWTClient{}
 
@@ -106,7 +110,7 @@ func TestMyDetailsReturns500Error(t *testing.T) {
 	}, err)
 }
 
-func TestMyDetailsReturns200(t *testing.T) {
+func TestGetCurrentUserDetailsReturns200(t *testing.T) {
 	logger, mockClient := SetUpTest()
 	mockJwtClient := &mockJWTClient{}
 
@@ -153,4 +157,52 @@ func TestMyDetailsReturns200(t *testing.T) {
 	user, err := client.GetCurrentUserDetails(ctx)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, user, expectedResponse)
+}
+
+func TestGetCurrentUserDetails_contract(t *testing.T) {
+	pact, err := consumer.NewV2Pact(consumer.MockHTTPProviderConfig{
+		Consumer: "sirius-supervision-management-information",
+		Provider: "sirius",
+		LogDir:   "../../../logs",
+		PactDir:  "../../../pacts",
+	})
+	assert.NoError(t, err)
+
+	err = pact.
+		AddInteraction().
+		Given("User exists").
+		UponReceiving("A request for the current user").
+		WithRequest("GET", "/supervision-api/v1/users/current", func(b *consumer.V2RequestBuilder) {
+			b.Header("Accept", matchers.S("application/json"))
+		}).
+		WillRespondWith(200, func(b *consumer.V2ResponseBuilder) {
+			b.Header("Content-Type", matchers.S("application/json"))
+			b.JSONBody(matchers.MapMatcher{
+				"id":          matchers.Like(1),
+				"displayName": matchers.Like("Colin Case"),
+				"roles":       matchers.EachLike("Case Manager", 1),
+			})
+		}).
+		ExecuteTest(t, func(config consumer.MockServerConfig) error {
+			logger, mockClient := SetUpTest()
+			mockJwtClient := &mockJWTClient{}
+
+			client, _ := NewApiClient(&mockClient, mockJwtClient, fmt.Sprintf("http://%s:%d", config.Host, config.Port), logger, "")
+
+			ctx := auth.Context{
+				User:    &shared.User{ID: 123},
+				Context: context.Background(),
+			}
+
+			user, _ := client.GetCurrentUserDetails(ctx)
+
+			assert.EqualValues(t, &shared.User{
+				ID:          1,
+				DisplayName: "Colin Case",
+				Roles:       []string{"Case Manager"},
+			}, user)
+			return nil
+		})
+
+	assert.NoError(t, err)
 }
