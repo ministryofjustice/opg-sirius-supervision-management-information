@@ -21,7 +21,7 @@ import (
 func TestGetCurrentUserDetails(t *testing.T) {
 	logger, mockClient := SetUpTest()
 	mockJwtClient := &mockJWTClient{}
-	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
+	client := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	json := `{
 			   "id":65,
@@ -82,7 +82,7 @@ func TestGetCurrentUserDetailsReturnsUnauthorisedClientError(t *testing.T) {
 		Context: context.Background(),
 	}
 
-	client, _ := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
+	client := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
 	_, err := client.GetCurrentUserDetails(ctx)
 	assert.Equal(t, ErrUnauthorized, err)
 }
@@ -101,7 +101,7 @@ func TestGetCurrentUserDetailsReturns500Error(t *testing.T) {
 		Context: context.Background(),
 	}
 
-	client, _ := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
+	client := NewApiClient(http.DefaultClient, mockJwtClient, svr.URL, logger, "")
 
 	_, err := client.GetCurrentUserDetails(ctx)
 	assert.Equal(t, StatusError{
@@ -115,7 +115,7 @@ func TestGetCurrentUserDetailsReturns200(t *testing.T) {
 	logger, mockClient := SetUpTest()
 	mockJwtClient := &mockJWTClient{}
 
-	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
+	client := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	json := `{
 		"id": 55,
@@ -185,7 +185,7 @@ func TestGetCurrentUserDetails_contract(t *testing.T) {
 			})
 		}).
 		ExecuteTest(t, func(config consumer.MockServerConfig) error {
-			client, _ := NewApiClient(
+			client := NewApiClient(
 				http.DefaultClient,
 				nil,
 				fmt.Sprintf("http://%s:%d", config.Host, config.Port)+"/supervision-api",

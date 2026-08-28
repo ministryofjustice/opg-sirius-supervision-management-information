@@ -57,14 +57,14 @@ func (e ClientError) Error() string {
 	return string(e)
 }
 
-func NewApiClient(httpClient HTTPClient, jwt JWTClient, baseURL string, logger *slog.Logger, backendURL string) (*ApiClient, error) {
+func NewApiClient(httpClient HTTPClient, jwt JWTClient, baseURL string, logger *slog.Logger, backendURL string) *ApiClient {
 	return &ApiClient{
 		http:       httpClient,
 		jwt:        jwt,
 		baseURL:    baseURL,
 		logger:     logger,
 		backendURL: backendURL,
-	}, nil
+	}
 }
 
 type HTTPClient interface {
