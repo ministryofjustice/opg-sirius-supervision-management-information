@@ -4,20 +4,21 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"io"
+	"net/http"
+	"testing"
+
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"github.com/stretchr/testify/assert"
-	"io"
-	"net/http"
-	"testing"
 )
 
 func TestUploadSuccess(t *testing.T) {
 	logger, mockClient := SetUpTest()
 
 	mockJwtClient := &mockJWTClient{}
-	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
+	client := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	data := shared.Upload{
 		UploadType: shared.ParseUploadType("BONDS"),
@@ -45,7 +46,7 @@ func TestSubmitUploadReturns500Error(t *testing.T) {
 	logger, mockClient := SetUpTest()
 
 	mockJwtClient := &mockJWTClient{}
-	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
+	client := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	mocks.GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		return &http.Response{
@@ -73,7 +74,7 @@ func TestSubmitUploadReturnsBadRequestError(t *testing.T) {
 	logger, mockClient := SetUpTest()
 
 	mockJwtClient := &mockJWTClient{}
-	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
+	client := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	mocks.GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		return &http.Response{
