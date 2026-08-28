@@ -20,7 +20,7 @@ import (
 func TestGetBondProviders(t *testing.T) {
 	logger, mockClient := SetUpTest()
 	mockJwtClient := &mockJWTClient{}
-	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
+	client := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	json := `[{
 			  "id": 1,
@@ -65,7 +65,7 @@ func TestGetBondProvidersUnauthorised(t *testing.T) {
 	logger, mockClient := SetUpTest()
 	mockJwtClient := &mockJWTClient{}
 
-	client, _ := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
+	client := NewApiClient(&mockClient, mockJwtClient, "http://localhost:3000", logger, "")
 
 	mocks.GetDoFunc = func(*http.Request) (*http.Response, error) {
 		return &http.Response{
@@ -108,7 +108,7 @@ func TestGetBondProviders_contract(t *testing.T) {
 			}, 1))
 		}).
 		ExecuteTest(t, func(config consumer.MockServerConfig) error {
-			client, _ := NewApiClient(
+			client := NewApiClient(
 				http.DefaultClient,
 				nil,
 				fmt.Sprintf("http://%s:%d", config.Host, config.Port)+"/supervision-api",

@@ -2,13 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/ministryofjustice/opg-go-common/env"
-	"github.com/ministryofjustice/opg-go-common/paginate"
-	"github.com/ministryofjustice/opg-go-common/telemetry"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/server"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"html/template"
 	"log/slog"
 	"net/http"
@@ -18,6 +11,14 @@ import (
 	"syscall"
 	"time"
 	"unicode"
+
+	"github.com/ministryofjustice/opg-go-common/env"
+	"github.com/ministryofjustice/opg-go-common/paginate"
+	"github.com/ministryofjustice/opg-go-common/telemetry"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/api"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/server"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
@@ -39,12 +40,9 @@ func run(ctx context.Context, logger *slog.Logger) error {
 
 	envVars := server.NewEnvironmentVars()
 
-	client, err := api.NewApiClient(http.DefaultClient, &auth.JWT{
+	client := api.NewApiClient(http.DefaultClient, &auth.JWT{
 		Secret: envVars.JWTSecret,
 	}, envVars.SiriusURL+supervisionAPIPath, logger, envVars.BackendURL)
-	if err != nil {
-		logger.Error("Error creating new Api Client", "error", err)
-	}
 	templates := createTemplates(envVars)
 
 	s := &http.Server{
