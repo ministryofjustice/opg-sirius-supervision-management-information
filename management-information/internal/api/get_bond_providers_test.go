@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
 	"github.com/opg-sirius-supervision-management-information/shared"
@@ -104,20 +105,24 @@ func TestGetBondProviders_contract(t *testing.T) {
 			b.JSONBody(matchers.EachLike(matchers.MapMatcher{
 				"id":   matchers.Like(1),
 				"name": matchers.Like("Marsh"),
-			}, 3))
+			}, 1))
 		}).
 		ExecuteTest(t, func(config consumer.MockServerConfig) error {
-			logger, mockClient := SetUpTest()
-			mockJwtClient := &mockJWTClient{}
-
-			client, _ := NewApiClient(&mockClient, mockJwtClient, fmt.Sprintf("http://%s:%d", config.Host, config.Port), logger, "")
+			client, _ := NewApiClient(
+				http.DefaultClient,
+				nil,
+				fmt.Sprintf("http://%s:%d", config.Host, config.Port)+"/supervision-api",
+				telemetry.NewLogger("opg-sirius-management-information"),
+				"",
+			)
 
 			ctx := auth.Context{
 				User:    &shared.User{ID: 123},
 				Context: context.Background(),
 			}
 
-			bondProviders, _ := client.GetBondProviders(ctx)
+			bondProviders, err := client.GetBondProviders(ctx)
+			assert.NoError(t, err)
 
 			assert.NotEmpty(t, bondProviders)
 			assert.EqualValues(t, shared.BondProvider{Id: 1, Name: "Marsh"}, bondProviders[0])

@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"io"
 	"log/slog"
 	"net/http"
 	"strconv"
+
+	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 )
 
 type ClientError string
@@ -105,6 +106,7 @@ func (c *ApiClient) newRequest(ctx context.Context, method, path string, body io
 	addCookiesFromContext(ctx, req)
 	addXsrfFromContext(ctx, req)
 	req.Header.Add("OPG-Bypass-Membrane", "1")
+	req.Header.Add("Accept", "application/json")
 
 	return req, err
 }
@@ -116,6 +118,7 @@ func (c *ApiClient) newBackendRequest(ctx context.Context, method, path string, 
 	}
 
 	req.Header.Add("Authorization", "Bearer "+c.jwt.CreateJWT(ctx))
+	req.Header.Add("Accept", "application/json")
 
 	return req, err
 }
