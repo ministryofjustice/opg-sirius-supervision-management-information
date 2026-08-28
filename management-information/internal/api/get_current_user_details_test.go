@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/mocks"
 	"github.com/opg-sirius-supervision-management-information/shared"
@@ -184,19 +185,22 @@ func TestGetCurrentUserDetails_contract(t *testing.T) {
 			})
 		}).
 		ExecuteTest(t, func(config consumer.MockServerConfig) error {
-			logger, mockClient := SetUpTest()
-			mockJwtClient := &mockJWTClient{}
-
-			client, _ := NewApiClient(&mockClient, mockJwtClient, fmt.Sprintf("http://%s:%d", config.Host, config.Port), logger, "")
-
+			client, _ := NewApiClient(
+				http.DefaultClient,
+				nil,
+				fmt.Sprintf("http://%s:%d", config.Host, config.Port)+"/supervision-api",
+				telemetry.NewLogger("opg-sirius-management-information"),
+				"",
+			)
 			ctx := auth.Context{
 				User:    &shared.User{ID: 123},
 				Context: context.Background(),
 			}
 
-			user, _ := client.GetCurrentUserDetails(ctx)
+			user, err := client.GetCurrentUserDetails(ctx)
+			assert.NoError(t, err)
 
-			assert.EqualValues(t, &shared.User{
+			assert.EqualValues(t, shared.User{
 				ID:          1,
 				DisplayName: "Colin Case",
 				Roles:       []string{"Case Manager"},
