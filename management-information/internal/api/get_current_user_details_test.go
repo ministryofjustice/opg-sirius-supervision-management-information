@@ -188,7 +188,7 @@ func TestGetCurrentUserDetails_contract(t *testing.T) {
 			client := NewApiClient(
 				http.DefaultClient,
 				nil,
-				fmt.Sprintf("http://%s:%d", config.Host, config.Port)+"/supervision-api",
+				fmt.Sprintf("http://%s:%d/supervision-api", config.Host, config.Port),
 				telemetry.NewLogger("opg-sirius-management-information"),
 				"",
 			)
