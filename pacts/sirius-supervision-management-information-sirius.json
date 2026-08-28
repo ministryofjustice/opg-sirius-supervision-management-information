@@ -5,74 +5,138 @@
   "interactions": [
     {
       "description": "A request for the bond providers list",
-      "providerState": "Bond providers exist",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "Bond providers exist"
+        }
+      ],
       "request": {
         "headers": {
-          "Accept": "application/json"
+          "Accept": [
+            "application/json"
+          ]
         },
         "method": "GET",
         "path": "/supervision-api/v1/bond-providers"
       },
       "response": {
-        "body": [
-          {
-            "id": 1,
-            "name": "Marsh"
-          }
-        ],
+        "body": {
+          "content": [
+            {
+              "id": 1,
+              "name": "Marsh"
+            }
+          ],
+          "contentType": "application/json",
+          "encoded": false
+        },
         "headers": {
-          "Content-Type": "application/json"
+          "Content-Type": [
+            "application/json"
+          ]
         },
         "matchingRules": {
-          "$.body": {
-            "match": "type",
-            "min": 1
-          },
-          "$.body[*].id": {
-            "match": "type"
-          },
-          "$.body[*].name": {
-            "match": "type"
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$[*].id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$[*].name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
           }
         },
         "status": 200
-      }
+      },
+      "transport": "http",
+      "type": "Synchronous/HTTP"
     },
     {
       "description": "A request for the current user",
-      "providerState": "User exists",
+      "pending": false,
+      "providerStates": [
+        {
+          "name": "User exists"
+        }
+      ],
       "request": {
         "headers": {
-          "Accept": "application/json"
+          "Accept": [
+            "application/json"
+          ]
         },
         "method": "GET",
         "path": "/supervision-api/v1/users/current"
       },
       "response": {
         "body": {
-          "displayName": "Colin Case",
-          "id": 1,
-          "roles": [
-            "Case Manager"
-          ]
+          "content": {
+            "displayName": "Colin Case",
+            "id": 1,
+            "roles": [
+              "Case Manager"
+            ]
+          },
+          "contentType": "application/json",
+          "encoded": false
         },
         "headers": {
-          "Content-Type": "application/json"
+          "Content-Type": [
+            "application/json"
+          ]
         },
         "matchingRules": {
-          "$.body.displayName": {
-            "match": "type"
-          },
-          "$.body.id": {
-            "match": "type"
-          },
-          "$.body.roles": {
-            "match": "type",
-            "min": 1
+          "body": {
+            "$.displayName": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            },
+            "$.roles": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            }
           }
         },
         "status": 200
-      }
+      },
+      "transport": "http",
+      "type": "Synchronous/HTTP"
     }
   ],
   "metadata": {
@@ -85,7 +149,7 @@
       "models": "1.3.14"
     },
     "pactSpecification": {
-      "version": "2.0.0"
+      "version": "4.0"
     }
   },
   "provider": {
