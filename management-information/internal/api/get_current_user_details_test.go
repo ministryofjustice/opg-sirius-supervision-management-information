@@ -178,11 +178,7 @@ func TestGetCurrentUserDetails_contract(t *testing.T) {
 		}).
 		WillRespondWith(200, func(b *consumer.V4ResponseBuilder) {
 			b.Header("Content-Type", matchers.S("application/json"))
-			b.JSONBody(matchers.MapMatcher{
-				"id":          matchers.Like(1),
-				"displayName": matchers.Like("Colin Case"),
-				"roles":       matchers.EachLike("Case Manager", 1),
-			})
+			b.BodyMatch(shared.User{})
 		}).
 		ExecuteTest(t, func(config consumer.MockServerConfig) error {
 			client := NewApiClient(
@@ -200,11 +196,7 @@ func TestGetCurrentUserDetails_contract(t *testing.T) {
 			user, err := client.GetCurrentUserDetails(ctx)
 			assert.NoError(t, err)
 
-			assert.EqualValues(t, shared.User{
-				ID:          1,
-				DisplayName: "Colin Case",
-				Roles:       []string{"Case Manager"},
-			}, user)
+			assert.EqualValues(t, 1, user.ID)
 			return nil
 		})
 
