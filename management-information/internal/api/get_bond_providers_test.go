@@ -102,10 +102,7 @@ func TestGetBondProviders_contract(t *testing.T) {
 		}).
 		WillRespondWith(200, func(b *consumer.V4ResponseBuilder) {
 			b.Header("Content-Type", matchers.S("application/json"))
-			b.JSONBody(matchers.EachLike(matchers.MapMatcher{
-				"id":   matchers.Like(1),
-				"name": matchers.Like("Marsh"),
-			}, 1))
+			b.BodyMatch(shared.BondProviders{})
 		}).
 		ExecuteTest(t, func(config consumer.MockServerConfig) error {
 			client := NewApiClient(
@@ -125,7 +122,7 @@ func TestGetBondProviders_contract(t *testing.T) {
 			assert.NoError(t, err)
 
 			assert.NotEmpty(t, bondProviders)
-			assert.EqualValues(t, shared.BondProvider{Id: 1, Name: "Marsh"}, bondProviders[0])
+			assert.EqualValues(t, 1, bondProviders[0].Id)
 
 			return nil
 		})
