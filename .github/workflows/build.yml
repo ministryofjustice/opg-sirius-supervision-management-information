@@ -67,19 +67,6 @@ jobs:
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install Pact Go runtime
-        run: |
-          pact_go_version="$(go list -m -f '{{.Version}}' github.com/pact-foundation/pact-go/v2)"
-          pact_lib_dir="$RUNNER_TEMP/pact-go"
-          
-          go install github.com/pact-foundation/pact-go/v2@"$pact_go_version"
-          mkdir -p "$pact_lib_dir"
-          "$(go env GOPATH)/bin/pact-go" install --libDir "$pact_lib_dir"
-          
-          echo "PACT_GO_LIB_DOWNLOAD_PATH=$pact_lib_dir" >> "$GITHUB_ENV"
-          echo "CGO_LDFLAGS=-L$pact_lib_dir" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=$pact_lib_dir:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
-
       - name: Run unit tests
         run: make test
 
@@ -94,9 +81,10 @@ jobs:
             --broker-password ${{ secrets.PACT_BROKER_PASSWORD }}
 
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           files: test-results/coverage.txt
+          fail_ci_if_error: false
           verbose: true
 
   lint:
@@ -113,7 +101,6 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Go Sec
-        continue-on-error: true
         run: make gosec
       - name: Upload GoSec results to GitHub Security tab
         if: ${{ always() }}
