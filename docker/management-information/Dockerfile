@@ -23,10 +23,10 @@ RUN mkdir -p web/static
 
 COPY management-information/web/assets web/assets
 COPY management-information/package.json .
-COPY management-information/yarn.lock .
+COPY management-information/package-lock.json .
 
-RUN yarn install --frozen-lockfile --ignore-scripts
-RUN yarn build
+RUN npm ci --ignore-scripts
+RUN npm run build
 
 FROM base AS healthcheck-build
 WORKDIR /app
