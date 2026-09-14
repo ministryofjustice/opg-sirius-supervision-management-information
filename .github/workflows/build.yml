@@ -35,7 +35,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: 1.27.0
+          go-version: 1.27.1
         id: go
 
       - name: Check out code
@@ -110,7 +110,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           role-session-name: opg-sirius-supervision-management-information-verify-readonly-fs
@@ -147,7 +147,7 @@ jobs:
             service_name: frontend
             build_options: --file docker/management-information/Dockerfile
     name: Build ${{ matrix.service_name }}
-    uses: ministryofjustice/opg-github-workflows/.github/workflows/build-multi-architecture-image.yml@17ca444d0b23a0f9f6c612f1bfb8dc9be358f235 # v3.19.6
+    uses: ministryofjustice/opg-github-workflows/.github/workflows/build-multi-architecture-image.yml@665698755d01499f42a2b24d65f449c4deff83d6 # v3.19.12
     with:
       image_name: ${{ matrix.image_name }}
       artifact_name: ${{ matrix.service_name }}-multi-arch
@@ -191,7 +191,7 @@ jobs:
           docker load -i /tmp/images/${{ matrix.service_name }}-multi-arch.tar
 
       - name: Configure OIDC AWS credentials for ECR push
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
         with:
           role-to-assume: arn:aws:iam::311462405659:role/sirius-supervision-component-ecr-role
           role-session-name: opg-sirius-management-information-github-actions-ecr-push
@@ -256,7 +256,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure OIDC AWS credentials for SSM
-        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c # v6.2.3
+        uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
         with:
           role-to-assume: arn:aws:iam::997462338508:role/sirius-supervision-component-ssm-role
           role-session-name: opg-sirius-management-information-github-actions-ssm-push
