@@ -39,10 +39,10 @@
     "@babel/helper-string-parser" "^7.29.7"
     "@babel/helper-validator-identifier" "^7.29.7"
 
-"@cypress/grep@^6.0.0":
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/@cypress/grep/-/grep-6.0.2.tgz#5575a005201ef0f7d1d13efd4963afd561771b40"
-  integrity sha512-6L0TyUxGydOhuc+wOXGGyKpx2m5ViggKo06jHkyoCXY5jQC1wR+dM+JjstRPG3b8NLktVYGjcAKRPuvRBLHfRw==
+"@cypress/grep@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@cypress/grep/-/grep-7.0.0.tgz#2cdc92a395017947dc18fe3623fa7334631887e1"
+  integrity sha512-pk1EJaIzt8xQZYA47xvwA2mA+ajGd73mDSIdYeAxYRuyifLVZGhTf1FpuTktjPYGarkdLjWKzDSijGfJnn6lEA==
   dependencies:
     debug "^4.3.4"
     find-test-names "^1.28.18"
