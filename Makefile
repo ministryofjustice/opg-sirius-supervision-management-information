@@ -22,8 +22,17 @@ build-dev:
 build-all:
 	docker compose build --parallel management-information management-information-api json-server cypress
 
-test: setup-directories
-	go run gotest.tools/gotestsum@latest --format testname  --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
+hub-tests: setup-directories
+	docker compose run --rm hub-test-runner
+
+api-tests: setup-directories
+	go run gotest.tools/gotestsum@latest --format testname  --junitfile test-results/api-unit-tests.xml -- -p 1 ./management-information-api/... -coverprofile=test-results/api-coverage.txt
+
+combine-coverage:
+	cat test-results/hub-coverage.txt > test-results/coverage.txt
+	tail -n +2 test-results/api-coverage.txt >> test-results/coverage.txt
+
+test: hub-tests api-tests combine-coverage
 
 clean:
 	docker compose down
