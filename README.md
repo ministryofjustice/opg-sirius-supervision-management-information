@@ -8,7 +8,7 @@
 #### Installing dependencies locally:
 (This is only necessary if running without docker, you will need to be logged into sirius with a user who has `reporting user` permissions)
 
-- `yarn install`
+- `npm ci --ignore-scripts`
 - `go mod download`
 ---
 
@@ -20,13 +20,13 @@ To enable debugging and hot-reloading of Go files:
 `make up`
 
 Hot-reloading is managed independently and should happen seamlessly. Hot-reloading for web assets (JS, CSS, etc.)
-is also provided via a Yarn watch command.
+is also provided via an npm watch command.
 
 -----
 
 Running without docker with: <br>
 Cd into /management-information <br>
-`yarn install && yarn build` <br>
+`npm ci --ignore-scripts && npm run build` <br>
 `go run main.go`
 
 This will host at:

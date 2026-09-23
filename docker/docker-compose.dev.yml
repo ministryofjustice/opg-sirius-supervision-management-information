@@ -28,7 +28,7 @@ services:
       - ./go.sum:/app/go.sum
       - ./shared:/app/shared
 
-  yarn:
+  npm:
     command: watch
 
   json-server:

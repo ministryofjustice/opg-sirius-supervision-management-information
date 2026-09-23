@@ -17,20 +17,29 @@ build:
 	docker compose build --no-cache --parallel management-information management-information-api
 
 build-dev:
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --no-cache --parallel management-information management-information-api yarn json-server
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build --no-cache --parallel management-information management-information-api npm json-server
 
 build-all:
 	docker compose build --parallel management-information management-information-api json-server cypress
 
-test: setup-directories
-	go run gotest.tools/gotestsum@latest --format testname  --junitfile test-results/unit-tests.xml -- ./... -coverprofile=test-results/test-coverage.txt
+hub-tests: setup-directories
+	docker compose run --rm hub-test-runner
+
+api-tests: setup-directories
+	go run gotest.tools/gotestsum@latest --format testname  --junitfile test-results/api-unit-tests.xml -- -p 1 ./management-information-api/... -coverprofile=test-results/api-coverage.txt
+
+combine-coverage:
+	cat test-results/hub-coverage.txt > test-results/coverage.txt
+	tail -n +2 test-results/api-coverage.txt >> test-results/coverage.txt
+
+test: hub-tests api-tests combine-coverage
 
 clean:
 	docker compose down
-	docker compose run --rm yarn
+	docker compose run --rm npm
 
 dev-up: clean build-dev
-	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information management-information-api localstack yarn
+	docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up management-information management-information-api localstack npm
 
 up: clean compile-assets build-all
 	docker compose -f docker-compose.yml up -d --wait management-information
@@ -39,7 +48,7 @@ down:
 	docker compose down
 
 compile-assets:
-	docker compose run --rm yarn build
+	docker compose run --rm npm run build
 
 cypress: setup-directories clean
 	docker compose run --build cypress

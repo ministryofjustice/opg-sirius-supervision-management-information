@@ -1,4 +1,4 @@
-FROM golang:1.26.5-alpine@sha256:0178a641fbb4858c5f1b48e34bdaabe0350a330a1b1149aabd498d0699ff5fb2 AS base
+FROM golang:1.27.1-alpine@sha256:cf6fca6641884b8433441b2b0652976f975e1d0fdd26d177eaaf8596087f3125 AS base
 
 RUN adduser \
     --disabled-password \
@@ -17,16 +17,17 @@ RUN update-ca-certificates
 RUN apk add --no-cache tzdata
 
 FROM node:24-alpine3.23@sha256:2bdb65ed1dab192432bc31c95f94155ca5ad7fc1392fb7eb7526ab682fa5bf14 AS asset-env
+RUN apk add git
 WORKDIR /app
 
 RUN mkdir -p web/static
 
 COPY management-information/web/assets web/assets
 COPY management-information/package.json .
-COPY management-information/yarn.lock .
+COPY management-information/package-lock.json .
 
-RUN yarn install --frozen-lockfile --ignore-scripts
-RUN yarn build
+RUN npm ci --ignore-scripts
+RUN npm run build
 
 FROM base AS healthcheck-build
 WORKDIR /app
