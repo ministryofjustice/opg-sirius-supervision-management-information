@@ -31,5 +31,15 @@ describe("Upload page", () => {
             cy.url().should('include', '/uploads?success=upload');
             cy.get('.moj-banner').contains('File successfully uploaded');
         });
+
+        it("displays the file upload when visits is selected and uploads without a bond provider", () => {
+            cy.get('#upload-type').select('Visits');
+            cy.get('#file-upload-field-input').should('not.have.class', 'hide');
+            cy.get('#bond-provider-field-input').should('have.class', 'hide');
+            cy.get('input[type="file"]').selectFile('fixtures/visits.csv');
+            cy.contains('.govuk-button', 'Upload file').click();
+            cy.url().should('include', '/uploads?success=upload');
+            cy.get('.moj-banner').contains('File successfully uploaded');
+        });
     });
 });

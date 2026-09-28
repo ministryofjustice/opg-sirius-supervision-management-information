@@ -6,6 +6,7 @@ import (
 
 var UploadTypes = []UploadType{
 	UploadTypeBonds,
+	UploadTypeVisits,
 }
 
 type UploadType int
@@ -13,10 +14,12 @@ type UploadType int
 const (
 	UploadTypeUnknown UploadType = iota
 	UploadTypeBonds
+	UploadTypeVisits
 )
 
 var uploadTypeMap = map[string]UploadType{
-	"Bonds": UploadTypeBonds,
+	"Bonds":  UploadTypeBonds,
+	"Visits": UploadTypeVisits,
 }
 
 func (u UploadType) String() string {
@@ -27,6 +30,8 @@ func (u UploadType) Directory() string {
 	switch u {
 	case UploadTypeBonds:
 		return "bonds-without-orders"
+	case UploadTypeVisits:
+		return "visits"
 	default:
 		return ""
 	}
@@ -36,6 +41,8 @@ func (u UploadType) Translation() string {
 	switch u {
 	case UploadTypeBonds:
 		return "Bonds"
+	case UploadTypeVisits:
+		return "Visits"
 	default:
 		return ""
 	}
@@ -45,6 +52,8 @@ func (u UploadType) Key() string {
 	switch u {
 	case UploadTypeBonds:
 		return "Bonds"
+	case UploadTypeVisits:
+		return "Visits"
 	default:
 		return ""
 	}

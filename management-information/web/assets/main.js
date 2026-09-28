@@ -30,6 +30,7 @@ const resetAll = (suffix) => () => {
 
 const show = (suffix) => (idName) => {
     document.querySelector(`#${idName}`).removeAttribute("disabled");
+    // document.querySelector(`#${idName}`)?.removeAttribute("disabled");
     htmx.removeClass(htmx.find(`#${idName}-${suffix}`), "hide")
 }
 
@@ -61,6 +62,9 @@ htmx.onLoad(() => {
             switch (uploadType) {
                 case "Bonds":
                     toggle.show("bond-provider");
+                    break;
+                case "Visits":
+                    toggle.show("file-upload");
                     break;
             }
         });

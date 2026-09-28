@@ -6,10 +6,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/opg-sirius-supervision-management-information/shared"
 )
 
 func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) error {
@@ -29,7 +30,12 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	fileName := fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006"))
+	fileName, err := uploadedFileName(upload)
+	if err != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return err
+	}
+
 	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), fileName)
 
 	_, err = s.fileStorage.StreamFile(context.Background(), s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
@@ -44,4 +50,24 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 	w.WriteHeader(http.StatusOK)
 
 	return nil
+}
+
+func uploadedFileName(upload shared.Upload) (string, error) {
+	switch upload.UploadType {
+	case shared.UploadTypeBonds:
+		if upload.BondProvider == nil || upload.BondProvider.Name == "" {
+			return "", fmt.Errorf("bond provider is required for bonds upload")
+		}
+
+		return fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006")), nil
+	case shared.UploadTypeVisits:
+		//fileName := filepath.Base(upload.Filename)
+		//if fileName == "." || fileName == string(filepath.Separator) || fileName == "" {
+		return fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006")), nil
+		//}
+
+		//return fileName, nil
+	default:
+		return "", fmt.Errorf("upload type is required")
+	}
 }

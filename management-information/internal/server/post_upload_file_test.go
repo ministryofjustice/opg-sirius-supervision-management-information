@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUploadFileHandlerSuccess(t *testing.T) {
+func TestBondsUploadFileHandlerSuccess(t *testing.T) {
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
 
@@ -28,6 +28,35 @@ func TestUploadFileHandlerSuccess(t *testing.T) {
 	bondProviders := shared.BondProviders{{Id: 1, Name: "Provider1"}}
 
 	client := mockApiClient{BondProviders: bondProviders}
+	ro := &mockRoute{client: client}
+
+	w := httptest.NewRecorder()
+	r, _ := http.NewRequest(http.MethodPost, "/uploads", &body)
+	r.Header.Add("Content-Type", writer.FormDataContentType())
+
+	appVars := AppVars{
+		Path: "/uploads",
+	}
+
+	appVars.EnvironmentVars.Prefix = "prefix"
+	sut := UploadFileHandler{ro}
+	err := sut.render(appVars, w, r)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "prefix/uploads?success=upload", w.Header().Get("HX-Redirect"))
+}
+
+func TestVisitsUploadFileHandlerSuccess(t *testing.T) {
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+
+	_ = writer.WriteField("uploadType", "Visits")
+
+	fileWriter, _ := writer.CreateFormFile("fileUpload", "visits.csv")
+	_, _ = fileWriter.Write([]byte("col1,col2\nval1,val2\n"))
+	_ = writer.Close()
+
+	client := mockApiClient{}
 	ro := &mockRoute{client: client}
 
 	w := httptest.NewRecorder()
@@ -84,7 +113,7 @@ func TestUploadFileHandlerValidationErrors(t *testing.T) {
 			expectedMessage: "Bond provider not recognised",
 		},
 		{
-			name:            "NoFileUploaded",
+			name:            "BondsNoFileUploaded",
 			uploadType:      "Bonds",
 			bondProvider:    "1",
 			fileContent:     nil,
@@ -93,7 +122,15 @@ func TestUploadFileHandlerValidationErrors(t *testing.T) {
 			expectedMessage: "No file uploaded",
 		},
 		{
-			name:            "InvalidCSVData",
+			name:            "VisitsNoFileUploaded",
+			uploadType:      "Visits",
+			fileContent:     nil,
+			expectedField:   "FileUpload",
+			expectedKey:     "required",
+			expectedMessage: "No file uploaded",
+		},
+		{
+			name:            "BondsInvalidCSVData",
 			uploadType:      "Bonds",
 			bondProvider:    "1",
 			fileContent:     ptr("invalid\"csv\"data\n\"unclosed"),
@@ -102,9 +139,25 @@ func TestUploadFileHandlerValidationErrors(t *testing.T) {
 			expectedMessage: "File does not contain valid CSV data",
 		},
 		{
-			name:            "EmptyCSVFile",
+			name:            "VisitsInvalidCSVData",
+			uploadType:      "Visits",
+			fileContent:     ptr("invalid\"csv\"data\n\"unclosed"),
+			expectedField:   "FileUpload",
+			expectedKey:     "invalid",
+			expectedMessage: "File does not contain valid CSV data",
+		},
+		{
+			name:            "BondsEmptyCSVFile",
 			uploadType:      "Bonds",
 			bondProvider:    "1",
+			fileContent:     ptr(""),
+			expectedField:   "FileUpload",
+			expectedKey:     "invalid",
+			expectedMessage: "File does not contain valid CSV data",
+		},
+		{
+			name:            "VisitsEmptyCSVFile",
+			uploadType:      "Visits",
 			fileContent:     ptr(""),
 			expectedField:   "FileUpload",
 			expectedKey:     "invalid",
