@@ -30,7 +30,6 @@ const resetAll = (suffix) => () => {
 
 const show = (suffix) => (idName) => {
     document.querySelector(`#${idName}`).removeAttribute("disabled");
-    // document.querySelector(`#${idName}`)?.removeAttribute("disabled");
     htmx.removeClass(htmx.find(`#${idName}-${suffix}`), "hide")
 }
 

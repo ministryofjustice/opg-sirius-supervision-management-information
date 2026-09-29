@@ -50,7 +50,7 @@ func Test_processUpload(t *testing.T) {
 			expectedStatusCode: http.StatusInternalServerError,
 		},
 		{
-			name: "pass",
+			name: "bonds successful upload",
 			upload: shared.Upload{
 				UploadType:   shared.UploadTypeBonds,
 				Filename:     "data.csv",
@@ -61,7 +61,7 @@ func Test_processUpload(t *testing.T) {
 			expectedFileName:   fmt.Sprintf("bonds-without-orders/Marsh_%s.csv", time.Now().Format("02_01_2006")),
 		},
 		{
-			name: "visits pass",
+			name: "visits successful upload",
 			upload: shared.Upload{
 				UploadType: shared.UploadTypeVisits,
 				Filename:   "visits.csv",

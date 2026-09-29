@@ -28,22 +28,7 @@ func TestBondsUploadFileHandlerSuccess(t *testing.T) {
 	bondProviders := shared.BondProviders{{Id: 1, Name: "Provider1"}}
 
 	client := mockApiClient{BondProviders: bondProviders}
-	ro := &mockRoute{client: client}
-
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest(http.MethodPost, "/uploads", &body)
-	r.Header.Add("Content-Type", writer.FormDataContentType())
-
-	appVars := AppVars{
-		Path: "/uploads",
-	}
-
-	appVars.EnvironmentVars.Prefix = "prefix"
-	sut := UploadFileHandler{ro}
-	err := sut.render(appVars, w, r)
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, "prefix/uploads?success=upload", w.Header().Get("HX-Redirect"))
+	makeRequestAndAssertTest(t, client, body, writer)
 }
 
 func TestVisitsUploadFileHandlerSuccess(t *testing.T) {
@@ -57,6 +42,11 @@ func TestVisitsUploadFileHandlerSuccess(t *testing.T) {
 	_ = writer.Close()
 
 	client := mockApiClient{}
+
+	makeRequestAndAssertTest(t, client, body, writer)
+}
+
+func makeRequestAndAssertTest(t *testing.T, client mockApiClient, body bytes.Buffer, writer *multipart.Writer) {
 	ro := &mockRoute{client: client}
 
 	w := httptest.NewRecorder()

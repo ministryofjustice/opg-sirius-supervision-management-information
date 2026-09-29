@@ -61,12 +61,7 @@ func uploadedFileName(upload shared.Upload) (string, error) {
 
 		return fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006")), nil
 	case shared.UploadTypeVisits:
-		//fileName := filepath.Base(upload.Filename)
-		//if fileName == "." || fileName == string(filepath.Separator) || fileName == "" {
 		return fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006")), nil
-		//}
-
-		//return fileName, nil
 	default:
 		return "", fmt.Errorf("upload type is required")
 	}
