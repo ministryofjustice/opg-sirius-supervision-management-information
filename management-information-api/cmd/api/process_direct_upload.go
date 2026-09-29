@@ -55,10 +55,6 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 func uploadedFileName(upload shared.Upload) (string, error) {
 	switch upload.UploadType {
 	case shared.UploadTypeBonds:
-		if upload.BondProvider == nil || upload.BondProvider.Name == "" {
-			return "", fmt.Errorf("bond provider is required for bonds upload")
-		}
-
 		return fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006")), nil
 	case shared.UploadTypeVisits:
 		return fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006")), nil
