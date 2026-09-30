@@ -2,9 +2,10 @@ package server
 
 import (
 	"context"
-	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
+
+	"github.com/opg-sirius-supervision-management-information/shared"
 )
 
 type mockTemplate struct {
@@ -52,6 +53,7 @@ type mockApiClient struct {
 	Error         error
 	User          shared.User
 	BondProviders []shared.BondProvider
+	UploadedFile  *shared.Upload
 }
 
 func (m mockApiClient) GetCurrentUserDetails(context context.Context) (shared.User, error) {
@@ -62,6 +64,9 @@ func (m mockApiClient) GetBondProviders(context context.Context) (shared.BondPro
 	return m.BondProviders, m.Error
 }
 
-func (m mockApiClient) Upload(context context.Context, data shared.Upload) error {
+func (m mockApiClient) Upload(context context.Context, fileData shared.Upload) error {
+	if m.UploadedFile != nil {
+		*m.UploadedFile = fileData
+	}
 	return m.Error
 }

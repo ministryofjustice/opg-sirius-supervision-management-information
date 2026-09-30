@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/opg-sirius-supervision-management-information/shared"
 )
@@ -30,13 +29,12 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	fileName, err := uploadedFileName(upload)
-	if err != nil {
+	if upload.Filename == "" {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		return err
+		return fmt.Errorf("filename is required")
 	}
 
-	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), fileName)
+	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), upload.Filename)
 
 	_, err = s.fileStorage.StreamFile(context.Background(), s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
 
@@ -52,13 +50,3 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 	return nil
 }
 
-func uploadedFileName(upload shared.Upload) (string, error) {
-	switch upload.UploadType {
-	case shared.UploadTypeBonds:
-		return fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006")), nil
-	case shared.UploadTypeVisits:
-		return fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006")), nil
-	default:
-		return "", fmt.Errorf("upload type is required")
-	}
-}

@@ -2,12 +2,14 @@ package server
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log/slog"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/shared"
@@ -27,8 +29,14 @@ func TestBondsUploadFileHandlerSuccess(t *testing.T) {
 
 	bondProviders := shared.BondProviders{{Id: 1, Name: "Provider1"}}
 
-	client := mockApiClient{BondProviders: bondProviders}
-	makeRequestAndAssertTest(t, client, body, writer)
+	var uploadedFile shared.Upload
+	client := mockApiClient{BondProviders: bondProviders, UploadedFile: &uploadedFile}
+
+	makeRequestAndAssertResponse(t, client, body, writer)
+
+	expectedFileName := fmt.Sprintf("Provider1_%s.csv", time.Now().Format("02_01_2006"))
+	assert.Equal(t, expectedFileName, uploadedFile.Filename)
+	assert.Equal(t, shared.UploadTypeBonds, uploadedFile.UploadType)
 }
 
 func TestVisitsUploadFileHandlerSuccess(t *testing.T) {
@@ -41,12 +49,17 @@ func TestVisitsUploadFileHandlerSuccess(t *testing.T) {
 	_, _ = fileWriter.Write([]byte("col1,col2\nval1,val2\n"))
 	_ = writer.Close()
 
-	client := mockApiClient{}
+	var uploadedFile shared.Upload
+	client := mockApiClient{UploadedFile: &uploadedFile}
 
-	makeRequestAndAssertTest(t, client, body, writer)
+	makeRequestAndAssertResponse(t, client, body, writer)
+
+	expectedFileName := fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006"))
+	assert.Equal(t, expectedFileName, uploadedFile.Filename)
+	assert.Equal(t, shared.UploadTypeVisits, uploadedFile.UploadType)
 }
 
-func makeRequestAndAssertTest(t *testing.T, client mockApiClient, body bytes.Buffer, writer *multipart.Writer) {
+func makeRequestAndAssertResponse(t *testing.T, client mockApiClient, body bytes.Buffer, writer *multipart.Writer) {
 	ro := &mockRoute{client: client}
 
 	w := httptest.NewRecorder()

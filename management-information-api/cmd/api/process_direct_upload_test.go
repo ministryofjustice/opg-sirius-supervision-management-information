@@ -53,22 +53,29 @@ func Test_processUpload(t *testing.T) {
 			name: "bonds successful upload",
 			upload: shared.Upload{
 				UploadType:   shared.UploadTypeBonds,
-				Filename:     "data.csv",
+				Filename:     fmt.Sprintf("Marsh_%s.csv", time.Now().Format("02_01_2006")),
 				Base64Data:   base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
 				BondProvider: &shared.BondProvider{Name: "Marsh"},
 			},
 			expectedStatusCode: http.StatusOK,
-			expectedFileName:   fmt.Sprintf("bonds-without-orders/Marsh_%s.csv", time.Now().Format("02_01_2006")),
 		},
 		{
 			name: "visits successful upload",
 			upload: shared.Upload{
 				UploadType: shared.UploadTypeVisits,
-				Filename:   "visits.csv",
+				Filename:   fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006")),
 				Base64Data: base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
 			},
 			expectedStatusCode: http.StatusOK,
-			expectedFileName:   fmt.Sprintf("visits/visits_%s.csv", time.Now().Format("02_01_2006")),
+		},
+		{
+			name: "missing file name error",
+			upload: shared.Upload{
+				UploadType: shared.UploadTypeVisits,
+				Filename:   "",
+				Base64Data: base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
+			},
+			expectedStatusCode: http.StatusUnprocessableEntity,
 		},
 	}
 	for _, tt := range tests {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/model"
@@ -63,7 +64,7 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 			return h.execute(w, r, data)
 		}
 
-		file, handler, err := r.FormFile("fileUpload")
+		file, _, err := r.FormFile("fileUpload")
 		if err != nil {
 			data.ValidationErrors = model.ValidationErrors{
 				"FileUpload": map[string]string{"required": "No file uploaded"},
@@ -95,19 +96,26 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 			return h.execute(w, r, data)
 		}
 
-		err = h.router.Client().Upload(ctx, shared.Upload{
+		upload := shared.Upload{
 			UploadType:   shared.UploadTypeBonds,
 			Base64Data:   base64.StdEncoding.EncodeToString(fileData),
-			Filename:     handler.Filename,
 			BondProvider: bondProvider,
-		})
+		}
+
+		upload.Filename, err = uploadedFileName(upload)
+		if err != nil {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			return err
+		}
+
+		err = h.router.Client().Upload(ctx, upload)
 		if err != nil {
 			return err
 		}
 
 		w.Header().Add("HX-Redirect", fmt.Sprintf("%s/uploads?success=upload", v.EnvironmentVars.Prefix))
 	case shared.UploadTypeVisits:
-		file, handler, err := r.FormFile("fileUpload")
+		file, _, err := r.FormFile("fileUpload")
 		if err != nil {
 			data.ValidationErrors = model.ValidationErrors{
 				"FileUpload": map[string]string{"required": "No file uploaded"},
@@ -139,11 +147,18 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 			return h.execute(w, r, data)
 		}
 
-		err = h.router.Client().Upload(ctx, shared.Upload{
+		upload := shared.Upload{
 			UploadType: shared.UploadTypeVisits,
 			Base64Data: base64.StdEncoding.EncodeToString(fileData),
-			Filename:   handler.Filename,
-		})
+		}
+
+		upload.Filename, err = uploadedFileName(upload)
+		if err != nil {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			return err
+		}
+
+		err = h.router.Client().Upload(ctx, upload)
 		if err != nil {
 			return err
 		}
@@ -157,4 +172,15 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		return h.execute(w, r, data)
 	}
 	return h.execute(w, r, data)
+}
+
+func uploadedFileName(upload shared.Upload) (string, error) {
+	switch upload.UploadType {
+	case shared.UploadTypeBonds:
+		return fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006")), nil
+	case shared.UploadTypeVisits:
+		return fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006")), nil
+	default:
+		return "", fmt.Errorf("upload type is required")
+	}
 }
