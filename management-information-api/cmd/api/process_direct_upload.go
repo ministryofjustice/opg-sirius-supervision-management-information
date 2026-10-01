@@ -6,10 +6,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/opg-sirius-supervision-management-information/shared"
 	"io"
 	"net/http"
-	"time"
+
+	"github.com/opg-sirius-supervision-management-information/shared"
 )
 
 func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) error {
@@ -29,8 +29,12 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 		return err
 	}
 
-	fileName := fmt.Sprintf("%s_%s.csv", upload.BondProvider.Name, time.Now().Format("02_01_2006"))
-	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), fileName)
+	if upload.Filename == "" {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return fmt.Errorf("filename is required")
+	}
+
+	filePath := fmt.Sprintf("%s/%s", upload.UploadType.Directory(), upload.Filename)
 
 	_, err = s.fileStorage.StreamFile(context.Background(), s.asyncBucket, filePath, io.NopCloser(bytes.NewReader(fileBytes)))
 
@@ -45,3 +49,4 @@ func (s *Server) ProcessDirectUpload(w http.ResponseWriter, r *http.Request) err
 
 	return nil
 }
+

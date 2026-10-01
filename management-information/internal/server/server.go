@@ -2,15 +2,16 @@ package server
 
 import (
 	"context"
+	"html/template"
+	"io"
+	"log/slog"
+	"net/http"
+
 	"github.com/ministryofjustice/opg-go-common/securityheaders"
 	"github.com/ministryofjustice/opg-go-common/telemetry"
 	"github.com/opg-sirius-supervision-management-information/management-information/internal/auth"
 	"github.com/opg-sirius-supervision-management-information/shared"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"html/template"
-	"io"
-	"log/slog"
-	"net/http"
 )
 
 type ApiClient interface {

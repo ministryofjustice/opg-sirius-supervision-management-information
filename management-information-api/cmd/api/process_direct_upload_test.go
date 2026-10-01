@@ -6,13 +6,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/ministryofjustice/opg-go-common/telemetry"
-	"github.com/opg-sirius-supervision-management-information/shared"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/ministryofjustice/opg-go-common/telemetry"
+	"github.com/opg-sirius-supervision-management-information/shared"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_processUpload(t *testing.T) {
@@ -21,6 +22,7 @@ func Test_processUpload(t *testing.T) {
 		upload             any
 		fileStorageError   error
 		expectedStatusCode int
+		expectedFileName   string
 	}{
 		{
 			name: "base64 decode error",
@@ -39,22 +41,41 @@ func Test_processUpload(t *testing.T) {
 		{
 			name: "file storage error",
 			upload: shared.Upload{
-				UploadType: shared.UploadTypeUnknown,
-				Base64Data: base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
-				Filename:   "test.csv",
+				UploadType:   shared.UploadTypeBonds,
+				Base64Data:   base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
+				Filename:     "test.csv",
+				BondProvider: &shared.BondProvider{Name: "Marsh"},
 			},
-			fileStorageError:   fmt.Errorf("Oops!"),
+			fileStorageError:   fmt.Errorf("file storage error"),
 			expectedStatusCode: http.StatusInternalServerError,
 		},
 		{
-			name: "pass",
+			name: "bonds successful upload",
 			upload: shared.Upload{
 				UploadType:   shared.UploadTypeBonds,
-				Filename:     "data.csv",
+				Filename:     fmt.Sprintf("Marsh_%s.csv", time.Now().Format("02_01_2006")),
 				Base64Data:   base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
-				BondProvider: shared.BondProvider{Name: "Marsh"},
+				BondProvider: &shared.BondProvider{Name: "Marsh"},
 			},
 			expectedStatusCode: http.StatusOK,
+		},
+		{
+			name: "visits successful upload",
+			upload: shared.Upload{
+				UploadType: shared.UploadTypeVisits,
+				Filename:   fmt.Sprintf("visits_%s.csv", time.Now().Format("02_01_2006")),
+				Base64Data: base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
+			},
+			expectedStatusCode: http.StatusOK,
+		},
+		{
+			name: "missing file name error",
+			upload: shared.Upload{
+				UploadType: shared.UploadTypeVisits,
+				Filename:   "",
+				Base64Data: base64.StdEncoding.EncodeToString([]byte("col1, col2\nabc,1")),
+			},
+			expectedStatusCode: http.StatusUnprocessableEntity,
 		},
 	}
 	for _, tt := range tests {
@@ -66,12 +87,6 @@ func Test_processUpload(t *testing.T) {
 		server := NewServer(&mockClient, mockS3, "async-bucket", nil, "")
 
 		var body bytes.Buffer
-
-		var expectedFileName string
-		if tt.expectedStatusCode == http.StatusOK {
-			expectedDate := time.Now().Format("02_01_2006")
-			expectedFileName = fmt.Sprintf("bonds-without-orders/Marsh_%s.csv", expectedDate)
-		}
 
 		_ = json.NewEncoder(&body).Encode(tt.upload)
 		ctx := telemetry.ContextWithLogger(context.Background(), telemetry.NewLogger("opg-sirius-management-information"))
@@ -87,8 +102,8 @@ func Test_processUpload(t *testing.T) {
 		}
 
 		assert.Equal(t, tt.expectedStatusCode, w.Result().StatusCode)
-		if expectedFileName != "" {
-			assert.Equal(t, expectedFileName, mockS3.fileName)
+		if tt.expectedFileName != "" {
+			assert.Equal(t, tt.expectedFileName, mockS3.fileName)
 		}
 	}
 }

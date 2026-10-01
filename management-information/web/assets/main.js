@@ -62,6 +62,9 @@ htmx.onLoad(() => {
                 case "Bonds":
                     toggle.show("bond-provider");
                     break;
+                case "Visits":
+                    toggle.show("file-upload");
+                    break;
             }
         });
 
