@@ -104,7 +104,6 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 
 		upload.Filename, err = uploadedFileName(upload)
 		if err != nil {
-			w.WriteHeader(http.StatusUnprocessableEntity)
 			return err
 		}
 
@@ -112,8 +111,6 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		if err != nil {
 			return err
 		}
-
-		w.Header().Add("HX-Redirect", fmt.Sprintf("%s/uploads?success=upload", v.EnvironmentVars.Prefix))
 	case shared.UploadTypeVisits:
 		file, _, err := r.FormFile("fileUpload")
 		if err != nil {
@@ -154,7 +151,6 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 
 		upload.Filename, err = uploadedFileName(upload)
 		if err != nil {
-			w.WriteHeader(http.StatusUnprocessableEntity)
 			return err
 		}
 
@@ -162,8 +158,6 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		if err != nil {
 			return err
 		}
-
-		w.Header().Add("HX-Redirect", fmt.Sprintf("%s/uploads?success=upload", v.EnvironmentVars.Prefix))
 	case shared.UploadTypeUnknown:
 		data.ValidationErrors = model.ValidationErrors{
 			"UploadType": map[string]string{"required": "Please select a report to upload"},
@@ -171,6 +165,9 @@ func (h *UploadFileHandler) render(v AppVars, w http.ResponseWriter, r *http.Req
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return h.execute(w, r, data)
 	}
+
+	w.Header().Add("HX-Redirect", fmt.Sprintf("%s/uploads?success=upload", v.EnvironmentVars.Prefix))
+
 	return h.execute(w, r, data)
 }
 

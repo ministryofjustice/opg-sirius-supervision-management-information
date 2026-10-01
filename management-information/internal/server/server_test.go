@@ -64,9 +64,9 @@ func (m mockApiClient) GetBondProviders(context context.Context) (shared.BondPro
 	return m.BondProviders, m.Error
 }
 
-func (m mockApiClient) Upload(context context.Context, fileData shared.Upload) error {
+func (m mockApiClient) Upload(context context.Context, data shared.Upload) error {
 	if m.UploadedFile != nil {
-		*m.UploadedFile = fileData
+		*m.UploadedFile = data
 	}
 	return m.Error
 }
