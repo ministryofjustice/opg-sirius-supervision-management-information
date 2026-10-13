@@ -32,7 +32,7 @@ describe("Upload page", () => {
             cy.get('.moj-banner').contains('File successfully uploaded');
         });
 
-        it("displays the file upload when visits is selected and uploads without a bond provider", () => {
+        it("displays the file upload when visits is selected and uploads successfully", () => {
             cy.get('#upload-type').select('Visits');
             cy.get('#file-upload-field-input').should('not.have.class', 'hide');
             cy.get('#bond-provider-field-input').should('have.class', 'hide');
