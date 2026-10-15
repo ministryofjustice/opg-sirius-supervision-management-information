@@ -74,13 +74,11 @@ services:
     command: golangci-lint run -v --timeout 5m
 
   gosec:
-     image: securego/gosec:2.24.6@sha256:2cf71ea78210c496c65e3a987576a9c8317b68e20f2960520b3f6f8f9f539be5
-     working_dir: /app
-     environment:
-      GOTOOLCHAIN: auto
-     volumes:
-         - .:/app
-     command: -exclude-dir=.gocache -fmt=sarif -out=/app/test-results/gosec.sarif -stdout -verbose=text /app/...
+    image: golang:1.27.1-alpine@sha256:cf6fca6641884b8433441b2b0652976f975e1d0fdd26d177eaaf8596087f3125
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: go run github.com/securego/gosec/v2/cmd/gosec@v2.24.6 -exclude-dir=.gocache -fmt=sarif -out=/app/test-results/gosec.sarif -stdout -verbose=text /app/...
 
   npm:
     build:
