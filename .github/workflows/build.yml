@@ -74,7 +74,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@cbe3b392738ccf3f987d68400dafcf4b0624a56c # v6.2.4
         with:
           role-to-assume: arn:aws:iam::311462405659:role/sirius-supervision-component-ecr-role
-          role-session-name: opg-sirius-supervision-management-information-github-actions-ecr-pull
+          role-session-name: opg-sirius-management-information-ecr-pull
           role-duration-seconds: 900
           aws-region: eu-west-1
       - name: ECR Login
