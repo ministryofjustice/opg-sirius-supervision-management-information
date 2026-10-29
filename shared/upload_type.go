@@ -31,7 +31,7 @@ func (u UploadType) Directory() string {
 	case UploadTypeBonds:
 		return "bonds-without-orders"
 	case UploadTypeVisits:
-		return "visits"
+		return "visits-batching"
 	default:
 		return ""
 	}
