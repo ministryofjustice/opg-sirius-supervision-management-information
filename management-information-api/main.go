@@ -80,7 +80,7 @@ func run(ctx context.Context, logger *slog.Logger) error {
 			os.Exit(1)
 		}
 	}()
-	logger.Info("Running at :" + envs.Port)
+	logger.Info("running", slog.String("port", envs.Port))
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
